@@ -26,7 +26,7 @@ public class MonitoringController : Controller
     /// <param name="monitoringData">Данные мониторинга</param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> AddOrUpdateAsync(MonitoringData monitoringData)
+    public async Task<ActionResult> AddOrUpdateAsync(MonitoringData monitoringData)
     {
         try
         {
@@ -36,13 +36,14 @@ public class MonitoringController : Controller
                 $"Version={monitoringData.Version}");
 
             await monitoringService.AddOrUpdateAsync(monitoringData);
+
+            return Ok();
         }
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка сохранения данных мониторинга");
+            throw;
         }
-
-        return Ok();
     }
 
     /// <summary>
@@ -52,20 +53,19 @@ public class MonitoringController : Controller
     /// <returns>Последние данные мониторинга или NULL, если нет данных по этому устройству</returns>
     [HttpGet]
     [Route("{id}")]
-    public async Task<MonitoringData?> GetByIdAsync(string id)
+    public async Task<ActionResult<MonitoringData?>> GetByIdAsync(string id)
     {
-        MonitoringData? result = null;
-
         try
         {
-            result = await monitoringService.GetByIdAsync(id);
+            MonitoringData? result = await monitoringService.GetByIdAsync(id);
+
+            return Ok(result);
         }
         catch (Exception e)
         {
             logger.LogError(e, $"Ошибка получения данных по идентификатору {id}");
+            throw;
         }
-
-        return result;
     }
 
     /// <summary>
@@ -74,19 +74,18 @@ public class MonitoringController : Controller
     /// <returns>Коллекция всех мониторинговых данных</returns>
     [HttpGet]
     [Route("list")]
-    public async Task<IEnumerable<MonitoringData>> GetListAsync()
+    public async Task<ActionResult<IEnumerable<MonitoringData>>> GetListAsync()
     {
-        IEnumerable<MonitoringData>? result = null;
-
         try
         {
-            result = await monitoringService.GetListAsync();
+            IEnumerable<MonitoringData> result =  await monitoringService.GetListAsync();
+
+            return Ok(result);
         }
         catch (Exception e)
         {
             logger.LogError(e, "Ошибка получения списка данных мониторинга");
+            throw;
         }
-
-        return result ?? Array.Empty<MonitoringData>();
     }
 }
