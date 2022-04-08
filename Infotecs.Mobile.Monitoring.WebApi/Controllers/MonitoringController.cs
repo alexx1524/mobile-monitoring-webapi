@@ -1,5 +1,7 @@
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Services;
+using Infotecs.Mobile.Monitoring.WebApi.Models;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Infotecs.Mobile.Monitoring.WebApi.Controllers;
@@ -23,17 +25,16 @@ public class MonitoringController : Controller
     /// <summary>
     /// Создание или обновление мониторинговых данных для устройства.
     /// </summary>
-    /// <param name="monitoringData">Данные мониторинга</param>
+    /// <param name="request">Запрос на добавление/обновление данных мониторинга</param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<ActionResult> AddOrUpdateAsync(MonitoringData monitoringData)
+    public async Task<ActionResult> AddOrUpdateAsync(AddMonitoringDataRequest request)
     {
         try
         {
-            logger.LogInformation($"Monitoring Id={monitoringData.Id}, " +
-                $"NodeName={monitoringData.NodeName}, " +
-                $"OS={monitoringData.OperatingSystem}, " +
-                $"Version={monitoringData.Version}");
+            var monitoringData = request.Adapt<MonitoringData>();
+
+            logger.LogInformation("Monitoring: {@Request}", request);
 
             await monitoringService.AddOrUpdateAsync(monitoringData);
 
