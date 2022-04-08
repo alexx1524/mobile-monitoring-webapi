@@ -34,10 +34,7 @@ public class MonitoringController : Controller
         {
             var monitoringData = request.Adapt<MonitoringData>();
 
-            logger.LogInformation($"Monitoring Id={monitoringData.Id}, " +
-                $"NodeName={monitoringData.NodeName}, " +
-                $"OS={monitoringData.OperatingSystem}, " +
-                $"Version={monitoringData.Version}");
+            logger.LogInformation("Monitoring: {@request}", request);
 
             await monitoringService.AddOrUpdateAsync(monitoringData);
 
