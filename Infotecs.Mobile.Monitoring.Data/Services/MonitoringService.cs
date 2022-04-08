@@ -9,7 +9,7 @@ public class MonitoringService : IMonitoringService
 
     public Task AddOrUpdateAsync(MonitoringData monitoringData)
     {
-        if (monitoringData == null || monitoringData.Id == null)
+        if (string.IsNullOrEmpty(monitoringData?.Id))
         {
             throw new ArgumentNullException(nameof(monitoringData));
         }
