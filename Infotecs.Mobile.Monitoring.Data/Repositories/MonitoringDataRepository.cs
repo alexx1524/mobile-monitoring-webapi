@@ -36,17 +36,17 @@ public class MonitoringDataRepository : IMonitoringDataRepository
         const string Query = "INSERT INTO \"MonitoringData\" (\"Id\", \"NodeName\", \"OperatingSystem\", \"Version\", \"CreatedDate\", \"UpdatedDate\") " +
             "VALUES (@Id, @NodeName, @OperatingSystem, @Version, @CreatedDate, @UpdatedDate)";
 
-        var parameters = new DynamicParameters();
-        parameters.Add("Id", monitoringData.Id, DbType.String);
-        parameters.Add("NodeName", monitoringData.NodeName, DbType.String);
-        parameters.Add("OperatingSystem", monitoringData.OperatingSystem, DbType.String);
-        parameters.Add("Version", monitoringData.Version, DbType.String);
-        parameters.Add("CreatedDate", monitoringData.CreatedDate, DbType.DateTime);
-        parameters.Add("UpdatedDate", monitoringData.UpdatedDate, DbType.DateTime);
-
         using (IDbConnection connection = context.CreateConnection())
         {
-            await connection.ExecuteAsync(Query, parameters);
+            await connection.ExecuteAsync(Query, new[]{ new
+            {
+                monitoringData.Id,
+                monitoringData.NodeName,
+                monitoringData.OperatingSystem,
+                monitoringData.Version,
+                monitoringData.CreatedDate,
+                monitoringData.UpdatedDate
+            }});
         }
     }
 
@@ -97,17 +97,17 @@ public class MonitoringDataRepository : IMonitoringDataRepository
         const string Query = "UPDATE \"MonitoringData\" SET \"NodeName\"=@NodeName, \"OperatingSystem\"=@OperatingSystem, " +
             "\"Version\"=@Version, \"CreatedDate\"=@CreatedDate, \"UpdatedDate\"=@UpdatedDate WHERE \"Id\" = @Id;";
 
-        var parameters = new DynamicParameters();
-        parameters.Add("Id", monitoringData.Id, DbType.String);
-        parameters.Add("NodeName", monitoringData.NodeName, DbType.String);
-        parameters.Add("OperatingSystem", monitoringData.OperatingSystem, DbType.String);
-        parameters.Add("Version", monitoringData.Version, DbType.String);
-        parameters.Add("CreatedDate", monitoringData.CreatedDate, DbType.DateTime);
-        parameters.Add("UpdatedDate", monitoringData.UpdatedDate, DbType.DateTime);
-
         using (IDbConnection connection = context.CreateConnection())
         {
-            await connection.ExecuteAsync(Query, parameters);
+            await connection.ExecuteAsync(Query, new[]{ new
+            {
+                monitoringData.Id,
+                monitoringData.NodeName,
+                monitoringData.OperatingSystem,
+                monitoringData.Version,
+                monitoringData.CreatedDate,
+                monitoringData.UpdatedDate
+            }});
         }
     }
 
