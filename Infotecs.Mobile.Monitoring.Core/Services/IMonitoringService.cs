@@ -26,4 +26,11 @@ public interface IMonitoringService
     /// </summary>
     /// <returns></returns>
     Task<IEnumerable<MonitoringData>> GetListAsync();
+
+    /// <summary>
+    /// Поиск мониторинговых данных по набору критериев с сортировкой и пагинацией
+    /// </summary>
+    /// <returns></returns>
+    Task<SearchResult<MonitoringData>> SearchAsync(MonitoringSearchCriteria criteria);
+
 }

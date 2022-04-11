@@ -1,7 +1,7 @@
 using System.Reflection;
 using FluentValidation.AspNetCore;
-using Infotecs.Mobile.Monitoring.Core.Services;
-using Infotecs.Mobile.Monitoring.Data.Services;
+using Infotecs.Mobile.Monitoring.Data;
+using Infotecs.Mobile.Monitoring.Data.Migrations;
 using Infotecs.Mobile.Monitoring.WebApi.Validators;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -37,7 +37,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
 // Add Data services
-builder.Services.AddSingleton<IMonitoringService, MonitoringService>();
+builder.Services.AddDataServices(builder.Configuration);
 
 WebApplication app = builder.Build();
 
@@ -63,4 +63,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+app.MigrateDatabase<Program>().Run();
