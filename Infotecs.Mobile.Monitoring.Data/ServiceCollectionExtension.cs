@@ -13,7 +13,7 @@ namespace Infotecs.Mobile.Monitoring.Data;
 
 public static class ServiceCollectionExtension
 {
-    public static IServiceCollection InitializeDataServices(this IServiceCollection serviceCollection,
+    public static IServiceCollection AddDataServices(this IServiceCollection serviceCollection,
         IConfiguration configuration)
     {
         serviceCollection

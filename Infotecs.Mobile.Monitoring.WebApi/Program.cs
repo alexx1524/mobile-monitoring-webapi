@@ -37,7 +37,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
 // Add Data services
-builder.Services.InitializeDataServices(builder.Configuration);
+builder.Services.AddDataServices(builder.Configuration);
 
 WebApplication app = builder.Build();
 
