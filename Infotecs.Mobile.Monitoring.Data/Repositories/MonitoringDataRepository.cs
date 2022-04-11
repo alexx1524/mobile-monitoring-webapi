@@ -124,7 +124,7 @@ public class MonitoringDataRepository : IMonitoringDataRepository
             throw new ArgumentException(nameof(criteria.PageNumber));
         }
 
-        int count = criteria.PageSize ?? 0;
+        int count = criteria.PageSize ?? 10;
         int skip = ((criteria.PageNumber ?? 1) - 1) * count;
 
         using (IDbConnection connection = context.CreateConnection())
