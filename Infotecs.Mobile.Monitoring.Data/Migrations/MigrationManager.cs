@@ -26,7 +26,7 @@ public static class MigrationManager
 
         IServiceProvider services = scope.ServiceProvider;
 
-        var migrationService = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+        var migrationService = services.GetRequiredService<IMigrationRunner>();
         var logger = services.GetRequiredService<ILogger<T>>();
         var configuration = services.GetService<IConfiguration>();
 
