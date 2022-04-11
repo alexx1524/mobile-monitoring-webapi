@@ -9,6 +9,16 @@ namespace Infotecs.Mobile.Monitoring.Data.Context;
 /// </summary>
 public class DapperContext
 {
+    /// <summary>
+    /// Строка подключения к базе данных для выполнения запросов
+    /// </summary>
+    public static string ConnectionString = "SqlConnection";
+
+    /// <summary>
+    /// Строка подключения к базе данных для создания базы данных
+    /// </summary>
+    public static string AdminConnectionString = "AdminSqlConnection";
+
     private readonly IConfiguration configuration;
 
     /// <summary>
@@ -22,5 +32,5 @@ public class DapperContext
     /// </summary>
     /// <returns>Подключение к базе данных</returns>
     public IDbConnection CreateConnection()
-        => new NpgsqlConnection(configuration.GetConnectionString("SqlConnection"));
+        => new NpgsqlConnection(configuration.GetConnectionString(ConnectionString));
 }

@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using FluentMigrator.Runner;
+using Infotecs.Mobile.Monitoring.Data.Context;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,8 +32,8 @@ public static class MigrationManager
 
         try
         {
-            string? connectionString = configuration.GetConnectionString("SqlConnection");
-            string? adminConnectionString = configuration.GetConnectionString("AdminSqlConnection");
+            string? connectionString = configuration.GetConnectionString(DapperContext.ConnectionString);
+            string? adminConnectionString = configuration.GetConnectionString(DapperContext.AdminConnectionString);
 
             string databaseName = ExtractDatabaseName(connectionString);
 

@@ -20,7 +20,7 @@ public static class ServiceCollectionExtension
             .AddLogging(c => c.AddFluentMigratorConsole())
             .AddFluentMigratorCore()
             .ConfigureRunner(c => c.AddPostgres()
-                .WithGlobalConnectionString(configuration.GetConnectionString("SqlConnection"))
+                .WithGlobalConnectionString(configuration.GetConnectionString(DapperContext.ConnectionString))
                 .ScanIn(Assembly.GetAssembly(typeof(MigrationManager))).For.Migrations());
 
         serviceCollection.AddSingleton<DapperContext>();
