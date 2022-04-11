@@ -47,8 +47,6 @@ public static class MigrationManager
                 logger.LogInformation("База данных уже создана");
             }
 
-            logger.LogInformation("Миграция базы данных начата");
-
             migrationService.ListMigrations();
             migrationService.MigrateUp();
 
@@ -70,12 +68,12 @@ public static class MigrationManager
     /// <returns></returns>
     private static string ExtractDatabaseName(string connectionString)
     {
-        var builder = new DbConnectionStringBuilder
+        var builder = new NpgsqlConnectionStringBuilder()
         {
             ConnectionString = connectionString,
         };
 
-        return (string)builder["Database"];
+        return builder.Database;
     }
 
     /// <summary>
