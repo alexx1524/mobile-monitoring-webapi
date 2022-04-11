@@ -33,7 +33,7 @@ public class MonitoringDataRepository : IMonitoringDataRepository
     /// <exception cref="NotImplementedException"></exception>
     public async Task Create(MonitoringData monitoringData)
     {
-        const string Query = "INSERT INTO \"MonitoringData\" (\"Id\", \"NodeName\", \"OperatingSystem\", \"Version\", \"CreatedDate\", \"UpdatedDate\") " +
+        const string Query = "INSERT INTO monitoring_data (id, nodename, operatingsystem, version, createddate, updateddate) " +
             "VALUES (@Id, @NodeName, @OperatingSystem, @Version, @CreatedDate, @UpdatedDate)";
 
         using (IDbConnection connection = context.CreateConnection())
@@ -57,7 +57,7 @@ public class MonitoringDataRepository : IMonitoringDataRepository
     /// <returns></returns>
     public async Task<IEnumerable<MonitoringData>> GetAll()
     {
-        const string Query = "SELECT * FROM \"MonitoringData\"";
+        const string Query = "SELECT * FROM monitoring_data";
 
         using (IDbConnection connection = context.CreateConnection())
         {
@@ -76,7 +76,7 @@ public class MonitoringDataRepository : IMonitoringDataRepository
     /// <exception cref="NotImplementedException"></exception>
     public async Task<MonitoringData?> GetById(string id)
     {
-        const string Query = "SELECT * FROM \"MonitoringData\" WHERE \"Id\" = @id";
+        const string Query = "SELECT * FROM monitoring_data WHERE id = @id";
 
         using (IDbConnection connection = context.CreateConnection())
         {
@@ -94,8 +94,8 @@ public class MonitoringDataRepository : IMonitoringDataRepository
     /// <returns></returns>
     public async Task Update(MonitoringData monitoringData)
     {
-        const string Query = "UPDATE \"MonitoringData\" SET \"NodeName\"=@NodeName, \"OperatingSystem\"=@OperatingSystem, " +
-            "\"Version\"=@Version, \"CreatedDate\"=@CreatedDate, \"UpdatedDate\"=@UpdatedDate WHERE \"Id\" = @Id;";
+        const string Query = "UPDATE monitoring_data SET nodename=@NodeName, operatingsystem=@OperatingSystem, " +
+            "version=@Version, createddate=@CreatedDate, updateddate=@UpdatedDate WHERE id = @Id;";
 
         using (IDbConnection connection = context.CreateConnection())
         {
@@ -132,18 +132,18 @@ public class MonitoringDataRepository : IMonitoringDataRepository
             var queryBuilder = new SqlBuilder();
 
             SqlBuilder.Template? selector = queryBuilder
-                .AddTemplate($"SELECT * FROM \"MonitoringData\" /**orderby**/ OFFSET {skip} ROWS FETCH NEXT {count} ROWS ONLY");
+                .AddTemplate($"SELECT * FROM monitoring_data /**orderby**/ OFFSET {skip} ROWS FETCH NEXT {count} ROWS ONLY");
 
             if (!string.IsNullOrEmpty(criteria.Sorting?.FieldName) && criteria.Sorting.Direction.HasValue)
             {
                 string direction = criteria.Sorting.Direction == SortOrder.Descending ? "DESC" : "ASC";
 
-                queryBuilder.OrderBy($"\"{criteria.Sorting.FieldName}\" {direction}");
+                queryBuilder.OrderBy($"{criteria.Sorting.FieldName} {direction}");
             }
 
             logger.LogSql(selector.RawSql);
 
-            var totalCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM \"MonitoringData\"");
+            var totalCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM monitoring_data");
 
             IEnumerable<MonitoringDataEntity>? entities = await connection.QueryAsync<MonitoringDataEntity>(selector.RawSql);
 

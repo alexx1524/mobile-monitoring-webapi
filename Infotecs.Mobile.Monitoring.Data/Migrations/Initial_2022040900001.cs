@@ -10,17 +10,17 @@ public class Initial_2022040900001 : Migration
 {
     public override void Up()
     {
-        Create.Table("MonitoringData")
-            .WithColumn("Id").AsString(128).NotNullable().PrimaryKey()
-            .WithColumn("NodeName").AsString(256).NotNullable()
-            .WithColumn("OperatingSystem").AsString(64).NotNullable()
-            .WithColumn("Version").AsString(64).NotNullable()
-            .WithColumn("CreatedDate").AsDateTimeOffset().NotNullable()
-            .WithColumn("UpdatedDate").AsDateTimeOffset().NotNullable();
+        Create.Table("monitoring_data")
+            .WithColumn("id").AsString(128).NotNullable().PrimaryKey()
+            .WithColumn("nodename").AsString(256).NotNullable()
+            .WithColumn("operatingsystem").AsString(64).NotNullable()
+            .WithColumn("version").AsString(64).NotNullable()
+            .WithColumn("createddate").AsDateTimeOffset().NotNullable()
+            .WithColumn("updateddate").AsDateTimeOffset().NotNullable();
     }
 
     public override void Down()
     {
-        Delete.Table("MonitoringData");
+        Delete.Table("monitoring_data");
     }
 }
