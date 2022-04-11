@@ -45,12 +45,7 @@ public class InMemoryMonitoringService : IMonitoringService
     /// <returns></returns>
     public Task<MonitoringData?> GetByIdAsync(string id)
     {
-        MonitoringData? result = null;
-
-        if (monitoringDataDictionary.ContainsKey(id))
-        {
-            result = monitoringDataDictionary[id];
-        }
+        monitoringDataDictionary.TryGetValue(id, out MonitoringData? result);
 
         return Task.FromResult(result);
     }
