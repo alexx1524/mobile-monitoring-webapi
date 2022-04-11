@@ -89,4 +89,25 @@ public class MonitoringController : Controller
             throw;
         }
     }
+
+    /// <summary>
+    /// Получение мониторинговых данных по указанным критериям
+    /// </summary>
+    /// <returns>Коллекция всех мониторинговых данных</returns>
+    [HttpPost]
+    [Route("search")]
+    public async Task<ActionResult<SearchResult<MonitoringData>>> SearchAsync(MonitoringSearchCriteria criteria)
+    {
+        try
+        {
+            SearchResult<MonitoringData> result = await monitoringService.SearchAsync(criteria);
+
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Ошибка поиска данных мониторинга по запросу {@Criteria}", criteria);
+            throw;
+        }
+    }
 }

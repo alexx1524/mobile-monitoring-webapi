@@ -1,30 +1,33 @@
-namespace Infotecs.Mobile.Monitoring.Core.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Infotecs.Mobile.Monitoring.Data.Models;
 
 /// <summary>
-/// Данные мониторинга от мобильных приложений.
+/// Класс данных монитолинга для сохранения в БД
 /// </summary>
 // ReSharper disable once ClassNeverInstantiated.Global
-public class MonitoringData
+public class MonitoringDataEntity
 {
+
     /// <summary>
     /// Идентификатор устройства.
     /// </summary>
-    public string? Id { get; set; }
+    public string Id { get; set; } = null!;
 
     /// <summary>
     /// Имя узла / пользователя
     /// </summary>
-    public string? NodeName { get; set; }
+    public string NodeName { get; set; } = null!;
 
     /// <summary>
     /// Наименование операционной системы
     /// </summary>
-    public string? OperatingSystem { get; set; }
+    public string OperatingSystem { get; set; } = null!;
 
     /// <summary>
     /// Версия клиента
     /// </summary>
-    public string? Version { get; set; }
+    public string? Version { get; set; } = null!;
 
     /// <summary>
     /// Дата/время создания мониторинговых данных

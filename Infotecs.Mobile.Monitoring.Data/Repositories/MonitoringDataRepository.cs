@@ -1,0 +1,158 @@
+﻿using System.Data;
+using Dapper;
+using DapperQueryBuilder;
+using FluentMigrator.Runner;
+using Infotecs.Mobile.Monitoring.Core.Models;
+using Infotecs.Mobile.Monitoring.Core.Models.Sorting;
+using Infotecs.Mobile.Monitoring.Core.Repositories;
+using Infotecs.Mobile.Monitoring.Data.Context;
+using Infotecs.Mobile.Monitoring.Data.Models;
+using Mapster;
+using Microsoft.Extensions.Logging;
+
+namespace Infotecs.Mobile.Monitoring.Data.Repositories;
+
+/// <summary>
+/// Репозиторий мониторинговых данных от устройств
+/// </summary>
+public class MonitoringDataRepository : IMonitoringDataRepository
+{
+    private readonly DapperContext context;
+    private readonly ILogger<MonitoringDataRepository> logger;
+
+    public MonitoringDataRepository(DapperContext context, ILogger<MonitoringDataRepository> logger)
+    {
+        this.context = context;
+        this.logger = logger;
+    }
+
+    /// <summary>
+    /// Создание новой записи мониторингавых данных
+    /// </summary>
+    /// <param name="monitoringData"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task Create(MonitoringData monitoringData)
+    {
+        const string Query = "INSERT INTO \"MonitoringData\" (\"Id\", \"NodeName\", \"OperatingSystem\", \"Version\", \"CreatedDate\", \"UpdatedDate\") " +
+            "VALUES (@Id, @NodeName, @OperatingSystem, @Version, @CreatedDate, @UpdatedDate)";
+
+        var parameters = new DynamicParameters();
+        parameters.Add("Id", monitoringData.Id, DbType.String);
+        parameters.Add("NodeName", monitoringData.NodeName, DbType.String);
+        parameters.Add("OperatingSystem", monitoringData.OperatingSystem, DbType.String);
+        parameters.Add("Version", monitoringData.Version, DbType.String);
+        parameters.Add("CreatedDate", monitoringData.CreatedDate, DbType.DateTime);
+        parameters.Add("UpdatedDate", monitoringData.UpdatedDate, DbType.DateTime);
+
+        using (IDbConnection connection = context.CreateConnection())
+        {
+            await connection.ExecuteAsync(Query, parameters);
+        }
+    }
+
+
+    /// <summary>
+    /// Получение всех записей
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<MonitoringData>> GetAll()
+    {
+        const string Query = "SELECT * FROM \"MonitoringData\"";
+
+        using (IDbConnection connection = context.CreateConnection())
+        {
+            IEnumerable<MonitoringDataEntity>? entities = await connection.QueryAsync<MonitoringDataEntity>(Query);
+
+            return entities.Adapt<IEnumerable<MonitoringData>>();
+        }
+    }
+
+
+    /// <summary>
+    /// Получение записи мониторинговых данных по идентификатору устройства
+    /// </summary>
+    /// <param name="id">Идентификатор устройства</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<MonitoringData?> GetById(string id)
+    {
+        const string Query = "SELECT * FROM \"MonitoringData\" WHERE \"Id\" = @id";
+
+        using (IDbConnection connection = context.CreateConnection())
+        {
+            var entity = await connection.QueryFirstOrDefaultAsync<MonitoringDataEntity>(Query, new { id });
+
+            return entity.Adapt<MonitoringData>();
+        }
+    }
+
+
+    /// <summary>
+    /// Обновить мониторингвые данные
+    /// </summary>
+    /// <param name="monitoringData"></param>
+    /// <returns></returns>
+    public async Task Update(MonitoringData monitoringData)
+    {
+        const string Query = "UPDATE \"MonitoringData\" SET \"NodeName\"=@NodeName, \"OperatingSystem\"=@OperatingSystem, " +
+            "\"Version\"=@Version, \"CreatedDate\"=@CreatedDate, \"UpdatedDate\"=@UpdatedDate WHERE \"Id\" = @Id;";
+
+        var parameters = new DynamicParameters();
+        parameters.Add("Id", monitoringData.Id, DbType.String);
+        parameters.Add("NodeName", monitoringData.NodeName, DbType.String);
+        parameters.Add("OperatingSystem", monitoringData.OperatingSystem, DbType.String);
+        parameters.Add("Version", monitoringData.Version, DbType.String);
+        parameters.Add("CreatedDate", monitoringData.CreatedDate, DbType.DateTime);
+        parameters.Add("UpdatedDate", monitoringData.UpdatedDate, DbType.DateTime);
+
+        using (IDbConnection connection = context.CreateConnection())
+        {
+            await connection.ExecuteAsync(Query, parameters);
+        }
+    }
+
+
+    /// <summary>
+    /// Поиск мониторинговых данных по набору критериев
+    /// </summary>
+    /// <param name="criteria">Критерии поиска мониторинговых данных</param>
+    /// <returns></returns>
+    public async Task<SearchResult<MonitoringData>> Search(MonitoringSearchCriteria criteria)
+    {
+        if (criteria.PageNumber is < 1)
+        {
+            throw new ArgumentException(nameof(criteria.PageNumber));
+        }
+
+        int count = criteria.PageSize ?? 0;
+        int skip = ((criteria.PageNumber ?? 1) - 1) * count;
+
+        using (IDbConnection connection = context.CreateConnection())
+        {
+            var queryBuilder = new SqlBuilder();
+
+            SqlBuilder.Template? selector = queryBuilder
+                .AddTemplate($"SELECT * FROM \"MonitoringData\" /**orderby**/ OFFSET {skip} ROWS FETCH NEXT {count} ROWS ONLY");
+
+            if (!string.IsNullOrEmpty(criteria.Sorting?.FieldName) && criteria.Sorting.Direction.HasValue)
+            {
+                string direction = criteria.Sorting.Direction == SortOrder.Descending ? "DESC" : "ASC";
+
+                queryBuilder.OrderBy($"\"{criteria.Sorting.FieldName}\" {direction}");
+            }
+
+            logger.LogSql(selector.RawSql);
+
+            var totalCount = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM \"MonitoringData\"");
+
+            IEnumerable<MonitoringDataEntity>? entities = await connection.QueryAsync<MonitoringDataEntity>(selector.RawSql);
+
+            return new SearchResult<MonitoringData>
+            {
+                TotalCount = totalCount,
+                Items = entities.Adapt<IEnumerable<MonitoringData>>()
+            };
+        }
+    }
+}
