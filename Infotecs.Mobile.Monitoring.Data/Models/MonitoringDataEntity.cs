@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Infotecs.Mobile.Monitoring.Data.Models;
+﻿namespace Infotecs.Mobile.Monitoring.Data.Models;
 
 /// <summary>
 /// Класс данных монитолинга для сохранения в БД

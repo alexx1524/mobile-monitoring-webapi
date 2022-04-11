@@ -1,5 +1,4 @@
 using System.Reflection;
-using FluentMigrator.Runner;
 using FluentValidation.AspNetCore;
 using Infotecs.Mobile.Monitoring.Data;
 using Infotecs.Mobile.Monitoring.Data.Migrations;

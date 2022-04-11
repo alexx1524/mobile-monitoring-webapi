@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Dapper;
-using DapperQueryBuilder;
 using FluentMigrator.Runner;
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Models.Sorting;
