@@ -34,19 +34,7 @@ public class NodeEventController : Controller
     [HttpPost]
     public async Task<ActionResult> AddEventAsync([FromBody] IEnumerable<NodeEvent> events)
     {
-        foreach (NodeEvent nodeEvent in events)
-        {
-            try
-            {
-                logger.LogInformation("Ивент {@NodeEvent}", nodeEvent);
-
-                await monitoringService.AddEvent(nodeEvent);
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Ошибка сохранения ивента {@NodeEvent}", nodeEvent);
-            }
-        }
+        await monitoringService.AddEvents(events);
 
         return NoContent();
     }

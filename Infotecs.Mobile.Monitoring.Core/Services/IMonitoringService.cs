@@ -42,10 +42,10 @@ public interface IMonitoringService
     Task<IEnumerable<NodeEvent>> GetNodeEvents(string nodeId);
 
     /// <summary>
-    /// Добавление ивента от ноды.
+    /// Добавление ивентов от ноды.
     /// </summary>
-    /// <param name="nodeEvent">Ивент.</param>
+    /// <param name="events">Список ивентов.</param>
     /// <returns>Задача.</returns>
-    Task AddEvent(NodeEvent nodeEvent);
+    Task AddEvents(IEnumerable<NodeEvent> events);
 
 }
