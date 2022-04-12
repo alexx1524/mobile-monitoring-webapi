@@ -34,4 +34,18 @@ public interface IMonitoringService
     /// <returns>Результаты поиска: количество элементов и список элементов.</returns>
     Task<SearchResult<MonitoringData>> SearchAsync(MonitoringSearchCriteria criteria);
 
+    /// <summary>
+    /// Получение всех ивентов по идентификатору ноды (устройства).
+    /// </summary>
+    /// <param name="nodeId">Идентификатор ноды (устройства).</param>
+    /// <returns>Список ивенонтов для ноды (устройства).</returns>
+    Task<IEnumerable<NodeEvent>> GetNodeEvents(string nodeId);
+
+    /// <summary>
+    /// Добавление ивентов от ноды.
+    /// </summary>
+    /// <param name="events">Список ивентов.</param>
+    /// <returns>Задача.</returns>
+    Task AddEvents(IEnumerable<NodeEvent> events);
+
 }

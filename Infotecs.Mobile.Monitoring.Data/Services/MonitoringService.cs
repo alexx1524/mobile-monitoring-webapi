@@ -1,6 +1,7 @@
 ﻿using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Infotecs.Mobile.Monitoring.Data.Services;
 
@@ -10,13 +11,18 @@ namespace Infotecs.Mobile.Monitoring.Data.Services;
 public class MonitoringService : IMonitoringService
 {
     private readonly IMonitoringDataRepository monitoringDataRepository;
+    private readonly ILogger<MonitoringService> logger;
 
     /// <summary>
     /// Конструктор.
     /// </summary>
     /// <param name="monitoringDataRepository">Репозиторий для работы с мониторингвыми данными.</param>
-    public MonitoringService(IMonitoringDataRepository monitoringDataRepository) =>
+    /// <param name="logger">Интерфейс для логгирования.</param>
+    public MonitoringService(IMonitoringDataRepository monitoringDataRepository, ILogger<MonitoringService> logger)
+    {
         this.monitoringDataRepository = monitoringDataRepository;
+        this.logger = logger;
+    }
 
     /// <summary>
     /// Создание или обновление данных мониторинга.
@@ -31,7 +37,7 @@ public class MonitoringService : IMonitoringService
             throw new ArgumentNullException(nameof(monitoringData));
         }
 
-        MonitoringData? existedMonitoringData = await monitoringDataRepository.GetById(monitoringData.Id);
+        MonitoringData? existedMonitoringData = await monitoringDataRepository.GetByIdAsync(monitoringData.Id);
 
         if (existedMonitoringData is null)
         {
@@ -39,7 +45,7 @@ public class MonitoringService : IMonitoringService
                 monitoringData.UpdatedDate =
                     DateTime.UtcNow;
 
-            await monitoringDataRepository.Create(monitoringData);
+            await monitoringDataRepository.CreateAsync(monitoringData);
         }
         else
         {
@@ -48,7 +54,7 @@ public class MonitoringService : IMonitoringService
             existedMonitoringData.Version = monitoringData.Version;
             existedMonitoringData.UpdatedDate = DateTime.UtcNow;
 
-            await monitoringDataRepository.Update(existedMonitoringData);
+            await monitoringDataRepository.UpdateAsync(existedMonitoringData);
         }
     }
 
@@ -59,7 +65,7 @@ public class MonitoringService : IMonitoringService
     /// <returns>Мониторинговые данные по указанному идентификатору.</returns>
     public async Task<MonitoringData?> GetByIdAsync(string id)
     {
-        MonitoringData? result = await monitoringDataRepository.GetById(id);
+        MonitoringData? result = await monitoringDataRepository.GetByIdAsync(id);
 
         return result;
     }
@@ -69,7 +75,7 @@ public class MonitoringService : IMonitoringService
     /// </summary>
     /// <returns>Все мониторинговые данные.</returns>
     public async Task<IEnumerable<MonitoringData>> GetListAsync() =>
-        await monitoringDataRepository.GetAll();
+        await monitoringDataRepository.GetAllAsync();
 
     /// <summary>
     /// Поиск мониторинговых данных по набору критериев.
@@ -78,9 +84,38 @@ public class MonitoringService : IMonitoringService
     /// <returns>Результаты поиска мониторинговых данных.</returns>
     public async Task<SearchResult<MonitoringData>> SearchAsync(MonitoringSearchCriteria criteria)
     {
-        SearchResult<MonitoringData> result = await monitoringDataRepository.Search(criteria);
+        SearchResult<MonitoringData> result = await monitoringDataRepository.SearchAsync(criteria);
 
         return result;
+    }
+
+    /// <summary>
+    /// Получение списка ивентов для указанной ноды (устройства).
+    /// </summary>
+    /// <param name="nodeId">Идентификатор ноды (устройства).</param>
+    /// <returns>Список ивентов.</returns>
+    public Task<IEnumerable<NodeEvent>> GetNodeEvents(string nodeId) => monitoringDataRepository.GetEventsAsync(nodeId);
+
+    /// <summary>
+    /// Добавление ивентов от ноды (устройства).
+    /// </summary>
+    /// <param name="events">Ивенты от ноды (устройства).</param>
+    /// <returns>Задача.</returns>
+    public async Task AddEvents(IEnumerable<NodeEvent> events)
+    {
+        foreach (NodeEvent nodeEvent in events)
+        {
+            try
+            {
+                logger.LogInformation("Ивент {@NodeEvent}", nodeEvent);
+
+                await monitoringDataRepository.AddEventAsync(nodeEvent);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Ошибка сохранения ивента {@NodeEvent}", nodeEvent);
+            }
+        }
     }
 
 }

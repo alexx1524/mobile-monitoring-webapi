@@ -69,7 +69,7 @@ public class MonitoringController : Controller
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Ошибка получения данных по идентификатору {id}");
+            logger.LogError(e, "Ошибка получения данных по идентификатору {@Id}", id);
             throw;
         }
     }

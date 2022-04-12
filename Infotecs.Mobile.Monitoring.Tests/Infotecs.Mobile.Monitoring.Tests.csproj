@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="Moq" Version="4.17.2" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -24,6 +25,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infotecs.Mobile.Monitoring.Core\Infotecs.Mobile.Monitoring.Core.csproj" />
+    <ProjectReference Include="..\Infotecs.Mobile.Monitoring.Data\Infotecs.Mobile.Monitoring.Data.csproj" />
+    <ProjectReference Include="..\Infotecs.Mobile.Monitoring.WebApi\Infotecs.Mobile.Monitoring.WebApi.csproj" />
   </ItemGroup>
 
 </Project>
