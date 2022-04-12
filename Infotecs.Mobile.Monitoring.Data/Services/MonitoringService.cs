@@ -83,4 +83,18 @@ public class MonitoringService : IMonitoringService
         return result;
     }
 
+    /// <summary>
+    /// Получение списка ивентов для указанной ноды (устройства).
+    /// </summary>
+    /// <param name="nodeId">Идентификатор ноды (устройства).</param>
+    /// <returns>Список ивентов.</returns>
+    public Task<IEnumerable<NodeEvent>> GetNodeEvents(string nodeId) => monitoringDataRepository.GetEvents(nodeId);
+
+    /// <summary>
+    /// Добавление ивентов от ноды (устройства).
+    /// </summary>
+    /// <param name="nodeEvent">Ивент от ноды (устройства).</param>
+    /// <returns>Задача.</returns>
+    public Task AddEvent(NodeEvent nodeEvent) => monitoringDataRepository.AddEvent(nodeEvent);
+
 }

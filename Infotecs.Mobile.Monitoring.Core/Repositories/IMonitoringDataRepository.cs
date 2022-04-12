@@ -41,4 +41,18 @@ public interface IMonitoringDataRepository
     /// <returns>Перечисление с мониторинговыми данными.</returns>
     public Task<SearchResult<MonitoringData>> Search(MonitoringSearchCriteria criteria);
 
+    /// <summary>
+    /// Получение списка ивентов ноды.
+    /// </summary>
+    /// <param name="nodeId">Идентификатор ноды (устройства).</param>
+    /// <returns>Список ивентов.</returns>
+    Task<IEnumerable<NodeEvent>> GetEvents(string nodeId);
+
+    /// <summary>
+    /// Добавление ивентов от ноды (устройства).
+    /// </summary>
+    /// <param name="events">Список ивентов.</param>
+    /// <returns>Задача.</returns>
+    Task AddEvent(NodeEvent nodeEvent);
+
 }

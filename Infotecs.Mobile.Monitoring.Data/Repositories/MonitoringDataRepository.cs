@@ -157,4 +157,44 @@ public class MonitoringDataRepository : IMonitoringDataRepository
             };
         }
     }
+
+    /// <summary>
+    /// Получение списка ивентов для указанной ноды (устройства).
+    /// </summary>
+    /// <param name="nodeId">Идентификатор ноды (устройства).</param>
+    /// <returns>Список ивентов.</returns>
+    public async Task<IEnumerable<NodeEvent>> GetEvents(string nodeId)
+    {
+        const string Query = "SELECT * FROM public.node_events WHERE nodeid = @nodeId;";
+
+        using (IDbConnection connection = context.CreateConnection())
+        {
+            IEnumerable<NodeEventEntity>? entity = await connection.QueryAsync<NodeEventEntity>(Query, new { nodeId });
+
+            return entity.Adapt<IEnumerable<NodeEvent>>();
+        }
+    }
+
+    /// <summary>
+    /// Добавление ивентd от ноды (устройства).
+    /// </summary>
+    /// <param name="nodeEvent">Ивент.</param>
+    /// <returns>Задача.</returns>
+    public async Task AddEvent(NodeEvent nodeEvent)
+    {
+        const string Query = "INSERT INTO public.node_events(name, description, date, nodeid) " +
+            "VALUES (@Name, @Description, @Date, @NodeId);";
+
+        using (IDbConnection connection = context.CreateConnection())
+        {
+            await connection.ExecuteAsync(Query, new[]{ new
+            {
+                nodeEvent.Name,
+                nodeEvent.Description,
+                nodeEvent.Date,
+                nodeEvent.NodeId,
+            }});
+        }
+    }
+
 }
