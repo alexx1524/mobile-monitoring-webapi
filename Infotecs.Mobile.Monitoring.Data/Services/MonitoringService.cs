@@ -12,18 +12,18 @@ public class MonitoringService : IMonitoringService
     private readonly IMonitoringDataRepository monitoringDataRepository;
 
     /// <summary>
-    /// Конструктор
+    /// Конструктор.
     /// </summary>
-    /// <param name="monitoringDataRepository">Репозиторий для работы с мониторингвыми данными</param>
+    /// <param name="monitoringDataRepository">Репозиторий для работы с мониторингвыми данными.</param>
     public MonitoringService(IMonitoringDataRepository monitoringDataRepository) =>
         this.monitoringDataRepository = monitoringDataRepository;
 
     /// <summary>
-    ///
+    /// Создание или обновление данных мониторинга.
     /// </summary>
-    /// <param name="monitoringData"></param>
-    /// <exception cref="ArgumentNullException">Исключение вызывается, если мониторингавые данные или идентификатор устроства
-    /// равны Null или пустой строке</exception>
+    /// <param name="monitoringData">Данные мониторинга.</param>
+    /// <exception cref="ArgumentNullException">Исключение вызывается, если мониторингавые данные или идентификатор устроства равны Null или пустой строке.</exception>
+    /// <returns>Задача.</returns>
     public async Task AddOrUpdateAsync(MonitoringData monitoringData)
     {
         if (string.IsNullOrEmpty(monitoringData?.Id))
@@ -53,10 +53,10 @@ public class MonitoringService : IMonitoringService
     }
 
     /// <summary>
-    /// Получение данных мониторинга по идентификатору устройства
+    /// Получение данных мониторинга по идентификатору устройства.
     /// </summary>
-    /// <param name="id">Идентификатор устройства</param>
-    /// <returns></returns>
+    /// <param name="id">Идентификатор устройства.</param>
+    /// <returns>Мониторинговые данные по указанному идентификатору.</returns>
     public async Task<MonitoringData?> GetByIdAsync(string id)
     {
         MonitoringData? result = await monitoringDataRepository.GetById(id);
@@ -65,17 +65,17 @@ public class MonitoringService : IMonitoringService
     }
 
     /// <summary>
-    /// Получение всех данных мониторинга
+    /// Получение всех данных мониторинга.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Все мониторинговые данные.</returns>
     public async Task<IEnumerable<MonitoringData>> GetListAsync() =>
         await monitoringDataRepository.GetAll();
 
     /// <summary>
-    /// Поиск мониторинговых данных по набору критериев
+    /// Поиск мониторинговых данных по набору критериев.
     /// </summary>
-    /// <param name="criteria">Набор критериев поиска</param>
-    /// <returns></returns>
+    /// <param name="criteria">Набор критериев поиска.</param>
+    /// <returns>Результаты поиска мониторинговых данных.</returns>
     public async Task<SearchResult<MonitoringData>> SearchAsync(MonitoringSearchCriteria criteria)
     {
         SearchResult<MonitoringData> result = await monitoringDataRepository.Search(criteria);

@@ -3,11 +3,14 @@
 namespace Infotecs.Mobile.Monitoring.Data.Migrations;
 
 /// <summary>
-/// Создание таблицы для мониторинговых данных
+/// Создание таблицы для мониторинговых данных.
 /// </summary>
 [Migration(2022040900001)]
 public class Initial_2022040900001 : Migration
 {
+    /// <summary>
+    /// Применение миграции.
+    /// </summary>
     public override void Up()
     {
         Create.Table("monitoring_data")
@@ -19,6 +22,9 @@ public class Initial_2022040900001 : Migration
             .WithColumn("updateddate").AsDateTimeOffset().NotNullable();
     }
 
+    /// <summary>
+    /// Откат миграции.
+    /// </summary>
     public override void Down()
     {
         Delete.Table("monitoring_data");

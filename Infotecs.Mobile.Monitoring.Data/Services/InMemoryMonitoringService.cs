@@ -12,11 +12,11 @@ public class InMemoryMonitoringService : IMonitoringService
     private readonly Dictionary<string, MonitoringData> monitoringDataDictionary = new();
 
     /// <summary>
-    /// Добавление/обновление записи
+    /// Добавление/обновление записи.
     /// </summary>
-    /// <param name="monitoringData"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="monitoringData">Данные мониторинга.</param>
+    /// <exception cref="ArgumentNullException">Переданы невалидные данные.</exception>
+    /// <returns>Задача.</returns>
     public Task AddOrUpdateAsync(MonitoringData monitoringData)
     {
         if (string.IsNullOrEmpty(monitoringData?.Id))
@@ -39,10 +39,10 @@ public class InMemoryMonitoringService : IMonitoringService
     }
 
     /// <summary>
-    /// Получение данных мониторинга по идентификатору устройства
+    /// Получение данных мониторинга по идентификатору устройства.
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="id">Идентификатор устройства.</param>
+    /// <returns>Мониторинговые данные.</returns>
     public Task<MonitoringData?> GetByIdAsync(string id)
     {
         monitoringDataDictionary.TryGetValue(id, out MonitoringData? result);
@@ -51,12 +51,18 @@ public class InMemoryMonitoringService : IMonitoringService
     }
 
     /// <summary>
-    /// Получение всех данных мониторинга
+    /// Получение всех данных мониторинга.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Все мониторинговые данные.</returns>
     public Task<IEnumerable<MonitoringData>> GetListAsync() =>
         Task.FromResult((IEnumerable<MonitoringData>)monitoringDataDictionary.Values.ToArray());
 
+    /// <summary>
+    /// Метод поиска мониторинговых данных по критериям.
+    /// </summary>
+    /// <param name="criteria">Критерии поиска.</param>
+    /// <returns>Результат поиска.</returns>
+    /// <exception cref="NotImplementedException">Метод не определен.</exception>
     public Task<SearchResult<MonitoringData>> SearchAsync(MonitoringSearchCriteria criteria) =>
         throw new NotImplementedException();
 

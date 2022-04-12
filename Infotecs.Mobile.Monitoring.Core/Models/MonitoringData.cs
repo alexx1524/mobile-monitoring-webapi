@@ -12,27 +12,27 @@ public class MonitoringData
     public string? Id { get; set; }
 
     /// <summary>
-    /// Имя узла / пользователя
+    /// Имя узла / пользователя.
     /// </summary>
     public string? NodeName { get; set; }
 
     /// <summary>
-    /// Наименование операционной системы
+    /// Наименование операционной системы.
     /// </summary>
     public string? OperatingSystem { get; set; }
 
     /// <summary>
-    /// Версия клиента
+    /// Версия клиента.
     /// </summary>
     public string? Version { get; set; }
 
     /// <summary>
-    /// Дата/время создания мониторинговых данных
+    /// Дата/время создания мониторинговых данных.
     /// </summary>
     public DateTime? CreatedDate { get; set; }
 
     /// <summary>
-    /// Дата/время последнего обновления мониторинговых данных
+    /// Дата/время последнего обновления мониторинговых данных.
     /// </summary>
     public DateTime? UpdatedDate { get; set; }
 }

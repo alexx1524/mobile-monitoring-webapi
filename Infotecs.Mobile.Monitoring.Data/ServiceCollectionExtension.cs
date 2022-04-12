@@ -11,8 +11,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infotecs.Mobile.Monitoring.Data;
 
+/// <summary>
+/// Расширение коллекции сервисов.
+/// </summary>
 public static class ServiceCollectionExtension
 {
+    /// <summary>
+    /// Добавление сервисов данных в DI.
+    /// </summary>
+    /// <param name="serviceCollection">Коллекция сервисов.</param>
+    /// <param name="configuration">Конфигурация приложения.</param>
+    /// <returns>Коллекция сервисов.</returns>
     public static IServiceCollection AddDataServices(this IServiceCollection serviceCollection,
         IConfiguration configuration)
     {

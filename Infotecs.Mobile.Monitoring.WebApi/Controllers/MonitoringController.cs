@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Infotecs.Mobile.Monitoring.WebApi.Controllers;
 
 /// <summary>
-/// Контроллер для работы с данными мониторинга мобильных устройств
+/// Контроллер для работы с данными мониторинга мобильных устройств.
 /// </summary>
 [ApiController]
 [Route("monitoring")]
@@ -16,6 +16,11 @@ public class MonitoringController : Controller
     private readonly ILogger<MonitoringController> logger;
     private readonly IMonitoringService monitoringService;
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="logger">Интерфейс логгирования.</param>
+    /// <param name="monitoringService">Интерфейс сервиса мониторинговых данных.</param>
     public MonitoringController(ILogger<MonitoringController> logger, IMonitoringService monitoringService)
     {
         this.logger = logger;
@@ -25,8 +30,8 @@ public class MonitoringController : Controller
     /// <summary>
     /// Создание или обновление мониторинговых данных для устройства.
     /// </summary>
-    /// <param name="request">Запрос на добавление/обновление данных мониторинга</param>
-    /// <returns></returns>
+    /// <param name="request">Запрос на добавление/обновление данных мониторинга.</param>
+    /// <returns>Результат ActionResult.</returns>
     [HttpPost]
     public async Task<ActionResult> AddOrUpdateAsync(AddMonitoringDataRequest request)
     {
@@ -48,10 +53,10 @@ public class MonitoringController : Controller
     }
 
     /// <summary>
-    /// Получение последних мониторинговых данных по идентификатору устройства
+    /// Получение последних мониторинговых данных по идентификатору устройства.
     /// </summary>
-    /// <param name="id">Идентификатор устройства</param>
-    /// <returns>Последние данные мониторинга или NULL, если нет данных по этому устройству</returns>
+    /// <param name="id">Идентификатор устройства.</param>
+    /// <returns>Последние данные мониторинга или NULL, если нет данных по этому устройству.</returns>
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult<MonitoringData?>> GetByIdAsync(string id)
@@ -70,9 +75,9 @@ public class MonitoringController : Controller
     }
 
     /// <summary>
-    /// Получение всех мониторинговых данных
+    /// Получение всех мониторинговых данных.
     /// </summary>
-    /// <returns>Коллекция всех мониторинговых данных</returns>
+    /// <returns>Коллекция всех мониторинговых данных.</returns>
     [HttpGet]
     [Route("list")]
     public async Task<ActionResult<IEnumerable<MonitoringData>>> GetListAsync()
@@ -91,9 +96,10 @@ public class MonitoringController : Controller
     }
 
     /// <summary>
-    /// Получение мониторинговых данных по указанным критериям
+    /// Получение мониторинговых данных по указанным критериям.
     /// </summary>
-    /// <returns>Коллекция всех мониторинговых данных</returns>
+    /// <param name="criteria">Критерии поиска.</param>
+    /// <returns>Коллекция всех мониторинговых данных.</returns>
     [HttpPost]
     [Route("search")]
     public async Task<ActionResult<SearchResult<MonitoringData>>> SearchAsync(MonitoringSearchCriteria criteria)

@@ -12,13 +12,18 @@ using Microsoft.Extensions.Logging;
 namespace Infotecs.Mobile.Monitoring.Data.Repositories;
 
 /// <summary>
-/// Репозиторий мониторинговых данных от устройств
+/// Репозиторий мониторинговых данных от устройств.
 /// </summary>
 public class MonitoringDataRepository : IMonitoringDataRepository
 {
     private readonly DapperContext context;
     private readonly ILogger<MonitoringDataRepository> logger;
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="context">Контекст создания подключений к базе данных.</param>
+    /// <param name="logger">Интерфейс логгирования.</param>
     public MonitoringDataRepository(DapperContext context, ILogger<MonitoringDataRepository> logger)
     {
         this.context = context;
@@ -26,11 +31,10 @@ public class MonitoringDataRepository : IMonitoringDataRepository
     }
 
     /// <summary>
-    /// Создание новой записи мониторингавых данных
+    /// Создание новой записи мониторингавых данных.
     /// </summary>
-    /// <param name="monitoringData"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <param name="monitoringData">Данные мониторинга.</param>
+    /// <returns>Задача.</returns>
     public async Task Create(MonitoringData monitoringData)
     {
         const string Query = "INSERT INTO monitoring_data (id, nodename, operatingsystem, version, createddate, updateddate) " +
@@ -52,9 +56,9 @@ public class MonitoringDataRepository : IMonitoringDataRepository
 
 
     /// <summary>
-    /// Получение всех записей
+    /// Получение всех записей.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Все мониторинговые данные.</returns>
     public async Task<IEnumerable<MonitoringData>> GetAll()
     {
         const string Query = "SELECT * FROM monitoring_data";
@@ -69,11 +73,10 @@ public class MonitoringDataRepository : IMonitoringDataRepository
 
 
     /// <summary>
-    /// Получение записи мониторинговых данных по идентификатору устройства
+    /// Получение записи мониторинговых данных по идентификатору устройства.
     /// </summary>
-    /// <param name="id">Идентификатор устройства</param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <param name="id">Идентификатор устройства.</param>
+    /// <returns>Мониторинговые данные.</returns>
     public async Task<MonitoringData?> GetById(string id)
     {
         const string Query = "SELECT * FROM monitoring_data WHERE id = @id";
@@ -88,10 +91,10 @@ public class MonitoringDataRepository : IMonitoringDataRepository
 
 
     /// <summary>
-    /// Обновить мониторингвые данные
+    /// Обновить мониторингвые данные.
     /// </summary>
-    /// <param name="monitoringData"></param>
-    /// <returns></returns>
+    /// <param name="monitoringData">Мониторинговые данные.</param>
+    /// <returns>Задача.</returns>
     public async Task Update(MonitoringData monitoringData)
     {
         const string Query = "UPDATE monitoring_data SET nodename=@NodeName, operatingsystem=@OperatingSystem, " +
@@ -113,10 +116,10 @@ public class MonitoringDataRepository : IMonitoringDataRepository
 
 
     /// <summary>
-    /// Поиск мониторинговых данных по набору критериев
+    /// Поиск мониторинговых данных по набору критериев.
     /// </summary>
-    /// <param name="criteria">Критерии поиска мониторинговых данных</param>
-    /// <returns></returns>
+    /// <param name="criteria">Критерии поиска мониторинговых данных.</param>
+    /// <returns>Результат поиска мониторингвых данных.</returns>
     public async Task<SearchResult<MonitoringData>> Search(MonitoringSearchCriteria criteria)
     {
         if (criteria.PageNumber is < 1)

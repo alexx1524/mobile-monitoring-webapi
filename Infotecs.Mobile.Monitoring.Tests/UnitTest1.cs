@@ -2,12 +2,18 @@ using Xunit;
 
 namespace Infotecs.Mobile.Monitoring.Tests
 {
+    /// <summary>
+    /// Placeholder.
+    /// </summary>
     public class UnitTest1
     {
+        /// <summary>
+        /// Placeholder.
+        /// </summary>
         [Fact]
         public void Test1()
         {
-            // Ничего не проверяет, потому что это шаблон проекта тестирования
+            // Р—Р°РєРѕС‚РѕРІРєР° РґР»СЏ Р±СѓРґСѓС‰РёС… С‚РµСЃС‚РѕРІ.
         }
     }
 }

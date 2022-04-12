@@ -1,18 +1,19 @@
 ﻿namespace Infotecs.Mobile.Monitoring.Core.Models;
 
 /// <summary>
-/// Класс для возврата рзультатов поиска
+/// Класс для возврата рзультатов поиска.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">Тип возвращаемой коллекции.</typeparam>
 public class SearchResult<T>
 {
     /// <summary>
-    /// Общее количество элементов
+    /// Общее количество элементов.
     /// </summary>
     public int TotalCount { get; set; }
 
     /// <summary>
-    /// Список элементов
+    /// Список элементов.
     /// </summary>
-    public IEnumerable<T> Items { get; set; }
+    public IEnumerable<T> Items { get; set; } = null!;
+
 }

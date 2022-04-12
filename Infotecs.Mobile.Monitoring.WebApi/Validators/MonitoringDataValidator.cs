@@ -4,10 +4,14 @@ using Infotecs.Mobile.Monitoring.Core.Models;
 namespace Infotecs.Mobile.Monitoring.WebApi.Validators;
 
 /// <summary>
-/// Класс для валидации мониторинговых данных
+/// Класс для валидации мониторинговых данных.
 /// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public class MonitoringDataValidator : AbstractValidator<MonitoringData>
 {
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public MonitoringDataValidator()
     {
         RuleFor(x => x.Id).NotNull().NotEmpty();

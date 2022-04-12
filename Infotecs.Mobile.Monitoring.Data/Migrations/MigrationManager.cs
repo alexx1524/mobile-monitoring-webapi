@@ -15,11 +15,11 @@ namespace Infotecs.Mobile.Monitoring.Data.Migrations;
 public static class MigrationManager
 {
     /// <summary>
-    /// Метод выполнения миграции базы данных
+    /// Метод выполнения миграции базы данных.
     /// </summary>
-    /// <param name="host">Хост для выполнения миграции</param>
-    /// <typeparam name="T">Тип, для которого запрашивается интерфейс логгирования</typeparam>
-    /// <returns></returns>
+    /// <param name="host">Хост для выполнения миграции.</param>
+    /// <typeparam name="T">Тип, для которого запрашивается интерфейс логгирования.</typeparam>
+    /// <returns>Хост.</returns>
     public static IHost MigrateDatabase<T>(this IHost host)
     {
         using IServiceScope scope = host.Services.CreateScope();
@@ -63,10 +63,10 @@ public static class MigrationManager
     }
 
     /// <summary>
-    /// Получение имени базы данных из строки подключения
+    /// Получение имени базы данных из строки подключения.
     /// </summary>
-    /// <param name="connectionString"></param>
-    /// <returns></returns>
+    /// <param name="connectionString">Строка подключения к базе данных.</param>
+    /// <returns>Наименование базы данных.</returns>
     private static string ExtractDatabaseName(string connectionString)
     {
         var builder = new NpgsqlConnectionStringBuilder()
@@ -74,16 +74,16 @@ public static class MigrationManager
             ConnectionString = connectionString,
         };
 
-        return builder.Database;
+        return builder.Database!;
     }
 
     /// <summary>
-    /// Метод для проверки, что база данных уже создана
+    /// Метод для проверки, что база данных уже создана.
     /// </summary>
-    /// <param name="connectionString">Строка подключения к базе данных</param>
-    /// <param name="databaseName">Наименование базы данных</param>
-    /// <param name="logger">Интерфейс для логгирования</param>
-    /// <returns></returns>
+    /// <param name="connectionString">Строка подключения к базе данных.</param>
+    /// <param name="databaseName">Наименование базы данных.</param>
+    /// <param name="logger">Интерфейс для логгирования.</param>
+    /// <returns>Создана база данных или нет.</returns>
     private static bool DatabaseExists(string connectionString, string databaseName, ILogger logger)
     {
         using (var connection = new NpgsqlConnection(connectionString))
@@ -114,12 +114,11 @@ public static class MigrationManager
     }
 
     /// <summary>
-    /// Метод создания базы данных
+    /// Метод создания базы данных.
     /// </summary>
-    /// <param name="connectionString">Строка подключения к базе данных</param>
-    /// <param name="databaseName">Наименование базы данных</param>
-    /// <param name="logger">Интерфейс для логгирования</param>
-    /// <returns></returns>
+    /// <param name="connectionString">Строка подключения к базе данных.</param>
+    /// <param name="databaseName">Наименование базы данных.</param>
+    /// <param name="logger">Интерфейс для логгирования.</param>
     private static void CreateDatabase(string connectionString, string databaseName, ILogger logger)
     {
         using (var connection = new NpgsqlConnection(connectionString))

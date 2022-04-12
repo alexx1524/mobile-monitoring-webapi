@@ -10,27 +10,28 @@ public interface IMonitoringService
     /// <summary>
     /// Создание новой записи или обновление существующей записи.
     /// </summary>
-    /// <param name="monitoringData">Данные мониторинга</param>
-    /// <returns>Задача</returns>
+    /// <param name="monitoringData">Данные мониторинга.</param>
+    /// <returns>Задача.</returns>
     Task AddOrUpdateAsync(MonitoringData monitoringData);
 
     /// <summary>
-    /// Получение данных мониторинга по идентификатору устройства
+    /// Получение данных мониторинга по идентификатору устройства.
     /// </summary>
-    /// <param name="id">Идентификатор устройства</param>
-    /// <returns>Задача, возвращающая данные мониторинга</returns>
+    /// <param name="id">Идентификатор устройства.</param>
+    /// <returns>Задача, возвращающая данные мониторинга.</returns>
     Task<MonitoringData?> GetByIdAsync(string id);
 
     /// <summary>
-    /// Получение всех данных мониторинга
+    /// Получение всех данных мониторинга.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Список мониторинговых данных.</returns>
     Task<IEnumerable<MonitoringData>> GetListAsync();
 
     /// <summary>
-    /// Поиск мониторинговых данных по набору критериев с сортировкой и пагинацией
+    /// Поиск мониторинговых данных по набору критериев с сортировкой и пагинацией.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="criteria">Критерии поиска.</param>
+    /// <returns>Результаты поиска: количество элементов и список элементов.</returns>
     Task<SearchResult<MonitoringData>> SearchAsync(MonitoringSearchCriteria criteria);
 
 }
