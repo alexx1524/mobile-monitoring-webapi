@@ -1,6 +1,5 @@
 ﻿using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Services;
-using Infotecs.Mobile.Monitoring.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Infotecs.Mobile.Monitoring.WebApi.Controllers;
@@ -59,16 +58,10 @@ public class NodeEventController : Controller
     /// <returns>Список ивентов.</returns>
     [HttpGet]
     [Route("bynode/{nodeId}")]
-    public async Task<ActionResult<NodeEvents>> GetEventsByNodeIdAsync(string nodeId)
+    public async Task<ActionResult<IEnumerable<NodeEvent>>> GetEventsByNodeIdAsync(string nodeId)
     {
         IEnumerable<NodeEvent> events = await monitoringService.GetNodeEvents(nodeId);
 
-        var result = new NodeEvents
-        {
-            Id = nodeId,
-            Events = events,
-        };
-
-        return Ok(result);
+        return Ok(events);
     }
 }

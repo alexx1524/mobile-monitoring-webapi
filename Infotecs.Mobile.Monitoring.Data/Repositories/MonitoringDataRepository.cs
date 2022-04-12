@@ -182,18 +182,17 @@ public class MonitoringDataRepository : IMonitoringDataRepository
     /// <returns>Задача.</returns>
     public async Task AddEvent(NodeEvent nodeEvent)
     {
-        const string Query = "INSERT INTO public.node_events(name, description, date, nodeid) " +
-            "VALUES (@Name, @Description, @Date, @NodeId);";
+        const string Query = "INSERT INTO public.node_events(name, date, nodeid) " +
+            "VALUES (@Name, @Date, @NodeId);";
 
         using (IDbConnection connection = context.CreateConnection())
         {
-            await connection.ExecuteAsync(Query, new[]{ new
+            await connection.ExecuteAsync(Query, new
             {
                 nodeEvent.Name,
-                nodeEvent.Description,
                 nodeEvent.Date,
                 nodeEvent.NodeId,
-            }});
+            });
         }
     }
 

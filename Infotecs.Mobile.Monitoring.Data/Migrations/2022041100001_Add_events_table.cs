@@ -17,9 +17,10 @@ public class Add_events_table_2022041100001 : Migration
         Create.Table("node_events")
             .WithColumn("id").AsInt64().NotNullable().PrimaryKey().Identity()
             .WithColumn("name").AsString(50).NotNullable()
-            .WithColumn("description").AsString(256).NotNullable()
             .WithColumn("date").AsDateTimeOffset().NotNullable()
             .WithColumn("nodeid").AsString(128).NotNullable().ForeignKey("monitoring_data", "id");
+
+        Create.Index("node_events_nodeid_idx").OnTable("node_events").OnColumn("nodeid");
     }
 
     /// <summary>
