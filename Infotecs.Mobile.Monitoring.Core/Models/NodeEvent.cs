@@ -3,6 +3,7 @@
 /// <summary>
 /// Событие от ноды (устройства).
 /// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public class NodeEvent
 {
     /// <summary>

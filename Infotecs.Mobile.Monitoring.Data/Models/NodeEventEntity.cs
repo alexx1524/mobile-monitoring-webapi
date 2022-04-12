@@ -3,6 +3,7 @@
 /// <summary>
 /// Класс ивента ноды для сохранения в БД.
 /// </summary>
+// ReSharper disable once ClassNeverInstantiated.Global
 public class NodeEventEntity
 {
     /// <summary>
