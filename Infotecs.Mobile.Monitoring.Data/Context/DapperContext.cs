@@ -31,6 +31,6 @@ public class DapperContext
     /// Создание подключения для выполнения запросов данных.
     /// </summary>
     /// <returns>Подключение к базе данных.</returns>
-    public IDbConnection CreateConnection()
+    public virtual IDbConnection CreateConnection()
         => new NpgsqlConnection(configuration.GetConnectionString(ConnectionString));
 }
