@@ -38,15 +38,10 @@ namespace Infotecs.Mobile.Monitoring.Tests
             await ClearData();
 
             // Arrange
-            var contextMock = new Mock<DapperContext>(config);
+            var context = new DapperContext(config);
             var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
 
-            var repository = new MonitoringDataRepository(contextMock.Object, loggerMock.Object);
-
-            contextMock
-                .SetupSequence(c => c.CreateConnection())
-                .Returns(new NpgsqlConnection(config.GetConnectionString(DapperContext.ConnectionString)))
-                .Returns(new NpgsqlConnection(config.GetConnectionString(DapperContext.ConnectionString)));
+            var repository = new MonitoringDataRepository(context, loggerMock.Object);
 
             var data = new MonitoringData
             {
@@ -67,15 +62,10 @@ namespace Infotecs.Mobile.Monitoring.Tests
             await ClearData();
 
             // Arrange
-            var contextMock = new Mock<DapperContext>(config);
+            var context = new DapperContext(config);
             var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
 
-            var repository = new MonitoringDataRepository(contextMock.Object, loggerMock.Object);
-
-            contextMock
-                .SetupSequence(c => c.CreateConnection())
-                .Returns(new NpgsqlConnection(config.GetConnectionString(DapperContext.ConnectionString)))
-                .Returns(new NpgsqlConnection(config.GetConnectionString(DapperContext.ConnectionString)));
+            var repository = new MonitoringDataRepository(context, loggerMock.Object);
 
             var data = new MonitoringData
             {
@@ -118,16 +108,10 @@ namespace Infotecs.Mobile.Monitoring.Tests
             await ClearData();
 
             // Arrange
-            var contextMock = new Mock<DapperContext>(config);
+            var context = new DapperContext(config);
             var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
 
-            var repository = new MonitoringDataRepository(contextMock.Object, loggerMock.Object);
-
-            contextMock
-                .SetupSequence(c => c.CreateConnection())
-                .Returns(new NpgsqlConnection(config.GetConnectionString("SqlConnection")))
-                .Returns(new NpgsqlConnection(config.GetConnectionString("SqlConnection")))
-                .Returns(new NpgsqlConnection(config.GetConnectionString("SqlConnection")));
+            var repository = new MonitoringDataRepository(context, loggerMock.Object);
 
             var data = new MonitoringData
             {
