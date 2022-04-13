@@ -68,6 +68,15 @@ public class WrongMonitoringData : IEnumerable<object[]>
             CreatedDate = DateTime.UtcNow,
             UpdatedDate = null,
         }};
+        yield return new object[] { new MonitoringData
+        {
+            Id = Guid.NewGuid().ToString(),
+            Version = "3.2.1",
+            NodeName = "Long name                                                                                       1",
+            OperatingSystem = "Ios",
+            CreatedDate = DateTime.UtcNow,
+            UpdatedDate = null,
+        }};
     }
 
     /// <inheritdoc/>
