@@ -18,16 +18,22 @@ namespace Infotecs.Mobile.Monitoring.Tests;
 /// <summary>
 /// Тест для репозитория мониторинговых данных.
 /// </summary>
-public class MonitoringDataRepositoryTest
+public class MonitoringDataRepositoryTest : IAsyncLifetime
 {
     private readonly IConfiguration config;
+    private readonly DapperContext context;
+    private readonly Mock<ILogger<MonitoringDataRepository>> loggerMock;
+    private readonly MonitoringDataRepository repository;
 
     /// <summary>
     /// Конструктор.
     /// </summary>
     public MonitoringDataRepositoryTest()
     {
-        this.config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+        context = new DapperContext(config);
+        loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
+        repository = new MonitoringDataRepository(context, loggerMock.Object);
     }
 
     /// <summary>
@@ -39,14 +45,6 @@ public class MonitoringDataRepositoryTest
     [ClassData(typeof(WrongMonitoringData))]
     public async Task MonitoringData_Incorrect_data_throws_exception(MonitoringData monitoringData)
     {
-        await ClearData();
-
-        // Arrange
-        var context = new DapperContext(config);
-        var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
-
-        var repository = new MonitoringDataRepository(context, loggerMock.Object);
-
         // Assert
         await Assert.ThrowsAsync<PostgresException>(async() => await repository.CreateAsync(monitoringData));
     }
@@ -58,14 +56,7 @@ public class MonitoringDataRepositoryTest
     [Fact]
     public async Task MonitoringData_Success_adding()
     {
-        await ClearData();
-
         // Arrange
-        var context = new DapperContext(config);
-        var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
-
-        var repository = new MonitoringDataRepository(context, loggerMock.Object);
-
         var data = new MonitoringData
         {
             Id = Guid.NewGuid().ToString(),
@@ -104,14 +95,7 @@ public class MonitoringDataRepositoryTest
     [Fact]
     public async Task MonitoringData_Success_updating()
     {
-        await ClearData();
-
         // Arrange
-        var context = new DapperContext(config);
-        var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
-
-        var repository = new MonitoringDataRepository(context, loggerMock.Object);
-
         var data = new MonitoringData
         {
             Id = Guid.NewGuid().ToString(),
@@ -163,14 +147,7 @@ public class MonitoringDataRepositoryTest
     [InlineData(50)]
     public async Task MonitoringData_GetAll_returns_correct_data(int count)
     {
-        await ClearData();
-
         // Arrange
-        var context = new DapperContext(config);
-        var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
-
-        var repository = new MonitoringDataRepository(context, loggerMock.Object);
-
         for (var i = 0; i < count; i++)
         {
             var data = new MonitoringData
@@ -201,14 +178,6 @@ public class MonitoringDataRepositoryTest
     [Fact]
     public async Task MonitoringData_GetById_returns_null_if_record_doesnt_exist()
     {
-        await ClearData();
-
-        // Arrange
-        var context = new DapperContext(config);
-        var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
-
-        var repository = new MonitoringDataRepository(context, loggerMock.Object);
-
         // Act
         MonitoringData? expected = await repository.GetByIdAsync("non-existent identifier");
 
@@ -224,14 +193,6 @@ public class MonitoringDataRepositoryTest
     [Fact]
     public async Task NodeEvent_Throws_exception_if_nodeid_doesnt_exist()
     {
-        await ClearData();
-
-        // Arrange
-        var context = new DapperContext(config);
-        var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
-
-        var repository = new MonitoringDataRepository(context, loggerMock.Object);
-
         var nodeEvent = new NodeEvent
         {
             NodeId = "non-existent identifier",
@@ -250,14 +211,6 @@ public class MonitoringDataRepositoryTest
     [Fact]
     public async Task NodeEvent_GetEvents_returns_valid_data()
     {
-        await ClearData();
-
-        // Arrange
-        var context = new DapperContext(config);
-        var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
-
-        var repository = new MonitoringDataRepository(context, loggerMock.Object);
-
         var monitoringData = new MonitoringData
         {
             Id = Guid.NewGuid().ToString(),
@@ -298,4 +251,9 @@ public class MonitoringDataRepositoryTest
         await connection.ExecuteAsync("DELETE FROM node_events;");
         await connection.ExecuteAsync("DELETE FROM monitoring_data;");
     }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public Task DisposeAsync() => ClearData();
+
 }
