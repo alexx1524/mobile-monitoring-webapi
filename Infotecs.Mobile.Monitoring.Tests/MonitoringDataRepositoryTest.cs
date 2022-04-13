@@ -43,7 +43,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// <returns>Задача.</returns>
     [Theory]
     [ClassData(typeof(WrongMonitoringData))]
-    public async Task MonitoringData_Incorrect_data_throws_exception(MonitoringData monitoringData)
+    public async Task CreateAsync_IfDataIsInvalid_ThrowsPostgresException(MonitoringData monitoringData)
     {
         // Assert
         await Assert.ThrowsAsync<PostgresException>(async() => await repository.CreateAsync(monitoringData));
@@ -54,7 +54,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// </summary>
     /// <returns>Задача.</returns>
     [Fact]
-    public async Task MonitoringData_Success_adding()
+    public async Task CreateAsync_IfDataIsValid_ShouldSucessfullyCreate()
     {
         // Arrange
         var data = new MonitoringData
@@ -93,7 +93,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// </summary>
     /// <returns>Задача.</returns>
     [Fact]
-    public async Task MonitoringData_Success_updating()
+    public async Task UpdateAsync_IfDataIsValid_ShouldSuccessfullyUpdate()
     {
         // Arrange
         var data = new MonitoringData
@@ -145,7 +145,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     [InlineData(2)]
     [InlineData(10)]
     [InlineData(50)]
-    public async Task MonitoringData_GetAll_returns_correct_data(int count)
+    public async Task GetAllAsync_IfDataExist_ShouldReturnAllMonitoringData(int count)
     {
         // Arrange
         for (var i = 0; i < count; i++)
@@ -176,7 +176,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// </summary>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous unit test.</placeholder></returns>
     [Fact]
-    public async Task MonitoringData_GetById_returns_null_if_record_doesnt_exist()
+    public async Task GetByIdAsync_IfRecordDoesntExist_ShouldReturnNull()
     {
         // Act
         MonitoringData? expected = await repository.GetByIdAsync("non-existent identifier");
@@ -191,7 +191,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// </summary>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous unit test.</placeholder></returns>
     [Fact]
-    public async Task NodeEvent_Throws_exception_if_nodeid_doesnt_exist()
+    public async Task AddEventAsync_IfNodeDoesntExist_ShouldThrowPostgresException()
     {
         var nodeEvent = new NodeEvent
         {
@@ -209,7 +209,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// </summary>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous unit test.</placeholder></returns>
     [Fact]
-    public async Task NodeEvent_GetEvents_returns_valid_data()
+    public async Task GetEventsAsync_IfEventsExist_ShouldReturnValidEvents()
     {
         var monitoringData = new MonitoringData
         {
@@ -243,6 +243,12 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
         Assert.Equal(nodeEvent.NodeId, data.First().NodeId);
     }
 
+    /// <inheritdoc />
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    /// <inheritdoc />
+    public Task DisposeAsync() => ClearData();
+
     private async Task ClearData()
     {
         string? connectionString = config.GetConnectionString(DapperContext.ConnectionString);
@@ -251,9 +257,4 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
         await connection.ExecuteAsync("DELETE FROM node_events;");
         await connection.ExecuteAsync("DELETE FROM monitoring_data;");
     }
-
-    public Task InitializeAsync() => Task.CompletedTask;
-
-    public Task DisposeAsync() => ClearData();
-
 }
