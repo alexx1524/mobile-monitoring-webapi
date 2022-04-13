@@ -178,9 +178,10 @@ public class MonitoringDataRepository : IMonitoringDataRepository
     /// <summary>
     /// Добавление ивентd от ноды (устройства).
     /// </summary>
+    /// <param name="nodeId">Идентификатор ноды.</param>
     /// <param name="nodeEvent">Ивент.</param>
     /// <returns>Задача.</returns>
-    public async Task AddEventAsync(NodeEvent nodeEvent)
+    public async Task AddEventAsync(string nodeId, NodeEvent nodeEvent)
     {
         const string Query = "INSERT INTO public.node_events(name, date, nodeid) " +
             "VALUES (@Name, @Date, @NodeId);";
@@ -191,7 +192,7 @@ public class MonitoringDataRepository : IMonitoringDataRepository
             {
                 nodeEvent.Name,
                 nodeEvent.Date,
-                nodeEvent.NodeId,
+                nodeId,
             });
         }
     }

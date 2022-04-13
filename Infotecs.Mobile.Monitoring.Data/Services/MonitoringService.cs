@@ -99,9 +99,10 @@ public class MonitoringService : IMonitoringService
     /// <summary>
     /// Добавление ивентов от ноды (устройства).
     /// </summary>
+    /// <param name="nodeId">Идентификатор ноды.</param>
     /// <param name="events">Ивенты от ноды (устройства).</param>
     /// <returns>Задача.</returns>
-    public async Task AddEvents(IEnumerable<NodeEvent> events)
+    public async Task AddEvents(string nodeId, IEnumerable<NodeEvent> events)
     {
         foreach (NodeEvent nodeEvent in events)
         {
@@ -109,7 +110,7 @@ public class MonitoringService : IMonitoringService
             {
                 logger.LogInformation("Ивент {@NodeEvent}", nodeEvent);
 
-                await monitoringDataRepository.AddEventAsync(nodeEvent);
+                await monitoringDataRepository.AddEventAsync(nodeId, nodeEvent);
             }
             catch (Exception e)
             {

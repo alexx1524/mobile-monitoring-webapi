@@ -7,11 +7,6 @@
 public class NodeEvent
 {
     /// <summary>
-    /// Идентификатор ноды.
-    /// </summary>
-    public string NodeId { get; set; } = null!;
-
-    /// <summary>
     /// Наименование ивента.
     /// </summary>
     public string Name { get; set; } = null!;

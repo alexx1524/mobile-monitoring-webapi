@@ -16,6 +16,5 @@ public class NodeEventValidator : AbstractValidator<NodeEvent>
     {
         RuleFor(x => x.Name).NotNull().NotEmpty().MaximumLength(50);
         RuleFor(x => x.Date).NotNull();
-        RuleFor(x => x.NodeId).NotNull().NotEmpty();
     }
 }

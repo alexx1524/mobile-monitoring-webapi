@@ -29,12 +29,14 @@ public class NodeEventController : Controller
     /// <summary>
     /// Добавление ивентов ноды (устройства).
     /// </summary>
+    /// <param name="nodeId">Идентификатор ноды.</param>
     /// <param name="events">Список ивентов от ноды.</param>
     /// <returns>Статус выполнения.</returns>
     [HttpPost]
-    public async Task<ActionResult> AddEventAsync([FromBody] IEnumerable<NodeEvent> events)
+    [Route("{nodeId}")]
+    public async Task<ActionResult> AddEventAsync([FromRoute] string nodeId, [FromBody] IEnumerable<NodeEvent> events)
     {
-        await monitoringService.AddEvents(events);
+        await monitoringService.AddEvents(nodeId, events);
 
         return NoContent();
     }

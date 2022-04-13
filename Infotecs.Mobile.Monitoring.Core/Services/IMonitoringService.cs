@@ -44,8 +44,9 @@ public interface IMonitoringService
     /// <summary>
     /// Добавление ивентов от ноды.
     /// </summary>
+    /// <param name="nodeId">Идентификатор ноды.</param>
     /// <param name="events">Список ивентов.</param>
     /// <returns>Задача.</returns>
-    Task AddEvents(IEnumerable<NodeEvent> events);
+    Task AddEvents(string nodeId, IEnumerable<NodeEvent> events);
 
 }

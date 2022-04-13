@@ -21,8 +21,6 @@ namespace Infotecs.Mobile.Monitoring.Tests;
 public class MonitoringDataRepositoryTest : IAsyncLifetime
 {
     private readonly IConfiguration config;
-    private readonly DapperContext context;
-    private readonly Mock<ILogger<MonitoringDataRepository>> loggerMock;
     private readonly MonitoringDataRepository repository;
 
     /// <summary>
@@ -31,8 +29,10 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     public MonitoringDataRepositoryTest()
     {
         config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-        context = new DapperContext(config);
-        loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
+
+        var context = new DapperContext(config);
+        var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
+
         repository = new MonitoringDataRepository(context, loggerMock.Object);
     }
 
@@ -43,11 +43,9 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// <returns>Задача.</returns>
     [Theory]
     [ClassData(typeof(WrongMonitoringData))]
-    public async Task CreateAsync_IfDataIsInvalid_ThrowsPostgresException(MonitoringData monitoringData)
-    {
+    public async Task CreateAsync_IfDataIsInvalid_ThrowsPostgresException(MonitoringData monitoringData) =>
         // Assert
         await Assert.ThrowsAsync<PostgresException>(async() => await repository.CreateAsync(monitoringData));
-    }
 
     /// <summary>
     /// Проверка успешного создания мониторинговых данных.
@@ -164,7 +162,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
         }
 
         // Act
-        IEnumerable<MonitoringData>? result = await repository.GetAllAsync();
+        IEnumerable<MonitoringData> result = await repository.GetAllAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -195,13 +193,13 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     {
         var nodeEvent = new NodeEvent
         {
-            NodeId = "non-existent identifier",
             Name = "eventName",
             Date = DateTime.UtcNow,
         };
 
         // Assert
-        await Assert.ThrowsAsync<PostgresException>(async () => await repository.AddEventAsync(nodeEvent));
+        await Assert.ThrowsAsync<PostgresException>(async ()
+            => await repository.AddEventAsync("non-existent identifier", nodeEvent));
     }
 
     /// <summary>
@@ -223,24 +221,20 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
 
         var nodeEvent = new NodeEvent
         {
-            NodeId = monitoringData.Id,
             Name = "eventName",
             Date = DateTime.UtcNow,
         };
 
         // Act
         await repository.CreateAsync(monitoringData);
-        await repository.AddEventAsync(nodeEvent);
+        await repository.AddEventAsync(monitoringData.Id, nodeEvent);
 
-        IEnumerable<NodeEvent> data = await repository.GetEventsAsync(monitoringData.Id);
+        NodeEvent[] data = (await repository.GetEventsAsync(monitoringData.Id)).ToArray();
 
         // Assert
         Assert.NotNull(data);
-        Assert.NotEmpty(data);
-        Assert.Single(data);
         Assert.Equal(nodeEvent.Name, data.First().Name);
         Assert.Equal(nodeEvent.Date?.ToString("u"), data.First().Date?.ToString("u"));
-        Assert.Equal(nodeEvent.NodeId, data.First().NodeId);
     }
 
     /// <inheritdoc />
