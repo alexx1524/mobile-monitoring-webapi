@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.Xunit2;
 using Dapper;
+using FluentAssertions;
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Data.Context;
 using Infotecs.Mobile.Monitoring.Data.Repositories;
@@ -43,94 +46,59 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// <returns>Задача.</returns>
     [Theory]
     [ClassData(typeof(WrongMonitoringData))]
-    public async Task CreateAsync_IfDataIsInvalid_ThrowsPostgresException(MonitoringData monitoringData) =>
+    public async Task CreateAsync_IfDataIsInvalid_ThrowsPostgresException(MonitoringData monitoringData)
+    {
         // Assert
-        await Assert.ThrowsAsync<PostgresException>(async() => await repository.CreateAsync(monitoringData));
+        Func<Task> act = async () => { await repository.CreateAsync(monitoringData); };
+
+        await act.Should().ThrowAsync<PostgresException>();
+    }
 
     /// <summary>
     /// Проверка успешного создания мониторинговых данных.
     /// </summary>
+    /// <param name="monitoringData">Мониторинговые данные ноды.</param>
     /// <returns>Задача.</returns>
-    [Fact]
-    public async Task CreateAsync_IfDataIsValid_ShouldSucessfullyCreate()
+    [Theory, AutoData]
+    public async Task CreateAsync_IfDataIsValid_ShouldSucessfullyCreate(MonitoringData monitoringData)
     {
-        // Arrange
-        var data = new MonitoringData
-        {
-            Id = Guid.NewGuid().ToString(),
-            Version = "1.2.3",
-            NodeName = "Name",
-            OperatingSystem = "Android",
-            CreatedDate = DateTime.UtcNow,
-            UpdatedDate = DateTime.UtcNow,
-        };
-
         // Act
-        await repository.CreateAsync(data);
+        await repository.CreateAsync(monitoringData);
 
-        MonitoringData? result = await repository.GetByIdAsync(data.Id);
+        MonitoringData? result = await repository.GetByIdAsync(monitoringData.Id);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.NotNull(result?.Id);
-        Assert.NotNull(result?.NodeName);
-        Assert.NotNull(result?.Version);
-        Assert.NotNull(result?.OperatingSystem);
-        Assert.NotNull(result?.CreatedDate);
-        Assert.NotNull(result?.UpdatedDate);
-        Assert.Equal(data.Id, result?.Id);
-        Assert.Equal(data.Version, result?.Version);
-        Assert.Equal(data.NodeName, result?.NodeName);
-        Assert.Equal(data.OperatingSystem, result?.OperatingSystem);
-        Assert.Equal(data.CreatedDate?.ToString("u"), result?.CreatedDate?.ToString("u"));
-        Assert.Equal(data.UpdatedDate?.ToString("u"), result?.UpdatedDate?.ToString("u"));
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(monitoringData, options => options
+            .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, new TimeSpan(1000)))
+            .WhenTypeIs<DateTime>());
     }
 
     /// <summary>
     /// Проверка успешного обновления мониторинговых данных.
     /// </summary>
     /// <returns>Задача.</returns>
-    [Fact]
-    public async Task UpdateAsync_IfDataIsValid_ShouldSuccessfullyUpdate()
+    [Theory, AutoData]
+    public async Task UpdateAsync_IfDataIsValid_ShouldSuccessfullyUpdate(MonitoringData monitoringData)
     {
-        // Arrange
-        var data = new MonitoringData
-        {
-            Id = Guid.NewGuid().ToString(),
-            Version = "1.2.3",
-            NodeName = "Name",
-            OperatingSystem = "Android",
-            CreatedDate = DateTime.UtcNow,
-            UpdatedDate = DateTime.UtcNow,
-        };
-
         // Act
-        await repository.CreateAsync(data);
+        await repository.CreateAsync(monitoringData);
 
-        data.NodeName = "Node name";
-        data.Version = "1.1.1";
-        data.OperatingSystem = "Ios";
-        data.CreatedDate = DateTime.UtcNow;
-        data.UpdatedDate = DateTime.UtcNow;
+        monitoringData.NodeName = "Node name";
+        monitoringData.Version = "1.1.1";
+        monitoringData.OperatingSystem = "Ios";
+        monitoringData.CreatedDate = DateTime.UtcNow;
+        monitoringData.UpdatedDate = DateTime.UtcNow;
 
-        await repository.UpdateAsync(data);
+        await repository.UpdateAsync(monitoringData);
 
-        MonitoringData? result = await repository.GetByIdAsync(data.Id);
+        MonitoringData? result = await repository.GetByIdAsync(monitoringData.Id);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.NotNull(result?.Id);
-        Assert.NotNull(result?.NodeName);
-        Assert.NotNull(result?.Version);
-        Assert.NotNull(result?.OperatingSystem);
-        Assert.NotNull(result?.CreatedDate);
-        Assert.NotNull(result?.UpdatedDate);
-        Assert.Equal(data.Id, result?.Id);
-        Assert.Equal(data.NodeName, result?.NodeName);
-        Assert.Equal(data.Version, result?.Version);
-        Assert.Equal(data.OperatingSystem, result?.OperatingSystem);
-        Assert.Equal(data.CreatedDate?.ToString("u"), result?.CreatedDate?.ToString("u"));
-        Assert.Equal(data.UpdatedDate?.ToString("u"), result?.UpdatedDate?.ToString("u"));
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo(monitoringData, options => options
+            .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, new TimeSpan(1000)))
+            .WhenTypeIs<DateTime>());
     }
 
     /// <summary>
@@ -146,27 +114,22 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     public async Task GetAllAsync_IfDataExist_ShouldReturnAllMonitoringData(int count)
     {
         // Arrange
-        for (var i = 0; i < count; i++)
-        {
-            var data = new MonitoringData
-            {
-                Id = Guid.NewGuid().ToString(),
-                Version = "1.2.3",
-                NodeName = $"Name {i}",
-                OperatingSystem = "Android",
-                CreatedDate = DateTime.UtcNow,
-                UpdatedDate = DateTime.UtcNow,
-            };
+        var fixture = new Fixture();
 
-            await repository.CreateAsync(data);
+        IEnumerable<MonitoringData>? items =  fixture.CreateMany<MonitoringData>(count);
+
+        foreach (MonitoringData monitoringData in items)
+        {
+            await repository.CreateAsync(monitoringData);
         }
 
         // Act
         IEnumerable<MonitoringData> result = await repository.GetAllAsync();
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal(count, result.Count());
+        result.Should()
+            .NotBeNullOrEmpty()
+            .And.HaveCount(count);
     }
 
     /// <summary>
@@ -180,61 +143,54 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
         MonitoringData? expected = await repository.GetByIdAsync("non-existent identifier");
 
         // Assert
-        Assert.Null(expected);
+        expected.Should().BeNull();
     }
 
     /// <summary>
     /// Тест проверяет, чтобы не добавлялись ивенты от ноды, которой нет. Проверка целостности базы данных
     /// и вторичного ключа.
     /// </summary>
+    /// <param name="nodeEvent">Ивент от ноды.</param>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous unit test.</placeholder></returns>
-    [Fact]
-    public async Task AddEventAsync_IfNodeDoesntExist_ShouldThrowPostgresException()
+    [Theory, AutoData]
+    public async Task AddEventAsync_IfNodeDoesntExist_ShouldThrowPostgresException(NodeEvent nodeEvent)
     {
-        var nodeEvent = new NodeEvent
-        {
-            Name = "eventName",
-            Date = DateTime.UtcNow,
-        };
-
         // Assert
-        await Assert.ThrowsAsync<PostgresException>(async ()
-            => await repository.AddEventAsync("non-existent identifier", nodeEvent));
+        Func<Task> act = async () => { await repository.AddEventAsync("non-existent identifier", nodeEvent); };
+
+        await act.Should().ThrowAsync<PostgresException>();
     }
 
     /// <summary>
     /// Тест проверяет, что метод GetEvents возвращает валидные данные для указанной ноды.
     /// </summary>
+    /// <param name="monitoringData">Данные мониторинга ноды.</param>
+    /// <param name="count">Количество ивентов.</param>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous unit test.</placeholder></returns>
-    [Fact]
-    public async Task GetEventsAsync_IfEventsExist_ShouldReturnValidEvents()
+    [Theory, AutoData]
+    public async Task GetEventsAsync_IfEventsExist_ShouldReturnValidEvents(MonitoringData monitoringData, byte count)
     {
-        var monitoringData = new MonitoringData
-        {
-            Id = Guid.NewGuid().ToString(),
-            Version = "1.2.3",
-            NodeName = "NodeName",
-            OperatingSystem = "Android",
-            CreatedDate = DateTime.UtcNow,
-            UpdatedDate = DateTime.UtcNow,
-        };
-
-        var nodeEvent = new NodeEvent
-        {
-            Name = "eventName",
-            Date = DateTime.UtcNow,
-        };
-
         // Act
         await repository.CreateAsync(monitoringData);
-        await repository.AddEventAsync(monitoringData.Id, nodeEvent);
 
-        NodeEvent[] data = (await repository.GetEventsAsync(monitoringData.Id)).ToArray();
+        var fixture = new Fixture();
+
+        IEnumerable<NodeEvent>? events = fixture.CreateMany<NodeEvent>(count);
+
+        foreach (NodeEvent nodeEvent in events)
+        {
+            await repository.AddEventAsync(monitoringData.Id, nodeEvent);
+        }
+
+        NodeEvent[] result = (await repository.GetEventsAsync(monitoringData.Id)).ToArray();
 
         // Assert
-        Assert.NotNull(data);
-        Assert.Equal(nodeEvent.Name, data.First().Name);
-        Assert.Equal(nodeEvent.Date?.ToString("u"), data.First().Date?.ToString("u"));
+        result.Should()
+            .NotBeNullOrEmpty()
+            .And.HaveCount(count)
+            .And.BeEquivalentTo(events, options => options
+                .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, new TimeSpan(1000)))
+                .WhenTypeIs<DateTime>());
     }
 
     /// <inheritdoc />
