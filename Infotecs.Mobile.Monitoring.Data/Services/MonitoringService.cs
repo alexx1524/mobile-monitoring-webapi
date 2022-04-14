@@ -1,4 +1,4 @@
-﻿using Infotecs.Mobile.Monitoring.Core.Models;
+using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
 using Microsoft.Extensions.Logging;
@@ -10,16 +10,20 @@ namespace Infotecs.Mobile.Monitoring.Data.Services;
 /// </summary>
 public class MonitoringService : IMonitoringService
 {
+
+    private readonly IDbContext dbContext;
     private readonly IMonitoringDataRepository monitoringDataRepository;
     private readonly ILogger<MonitoringService> logger;
 
     /// <summary>
     /// Конструктор.
     /// </summary>
+    /// <param name="dbContext">Контекст базы данных.</param>
     /// <param name="monitoringDataRepository">Репозиторий для работы с мониторингвыми данными.</param>
     /// <param name="logger">Интерфейс для логгирования.</param>
-    public MonitoringService(IMonitoringDataRepository monitoringDataRepository, ILogger<MonitoringService> logger)
+    public MonitoringService(IDbContext dbContext, IMonitoringDataRepository monitoringDataRepository, ILogger<MonitoringService> logger)
     {
+        this.dbContext = dbContext;
         this.monitoringDataRepository = monitoringDataRepository;
         this.logger = logger;
     }
@@ -28,33 +32,49 @@ public class MonitoringService : IMonitoringService
     /// Создание или обновление данных мониторинга.
     /// </summary>
     /// <param name="monitoringData">Данные мониторинга.</param>
+    /// <param name="events">Список ивентов.</param>
     /// <exception cref="ArgumentNullException">Исключение вызывается, если мониторингавые данные или идентификатор устроства равны Null или пустой строке.</exception>
     /// <returns>Задача.</returns>
-    public async Task AddOrUpdateAsync(MonitoringData monitoringData)
+    public async Task AddOrUpdateAsync(MonitoringData monitoringData, IEnumerable<NodeEvent> events)
     {
-        if (string.IsNullOrEmpty(monitoringData?.Id))
+        if (string.IsNullOrEmpty(monitoringData.Id))
         {
             throw new ArgumentNullException(nameof(monitoringData));
         }
 
-        MonitoringData? existedMonitoringData = await monitoringDataRepository.GetByIdAsync(monitoringData.Id);
-
-        if (existedMonitoringData is null)
+        try
         {
-            monitoringData.CreatedDate =
-                monitoringData.UpdatedDate =
-                    DateTime.UtcNow;
+            MonitoringData? existedMonitoringData = await monitoringDataRepository.GetByIdAsync(monitoringData.Id);
 
-            await monitoringDataRepository.CreateAsync(monitoringData);
+            if (existedMonitoringData is null)
+            {
+                monitoringData.CreatedDate =
+                    monitoringData.UpdatedDate =
+                        DateTime.UtcNow;
+
+                await monitoringDataRepository.CreateAsync(monitoringData);
+            }
+            else
+            {
+                existedMonitoringData.NodeName = monitoringData.NodeName;
+                existedMonitoringData.OperatingSystem = monitoringData.OperatingSystem;
+                existedMonitoringData.Version = monitoringData.Version;
+                existedMonitoringData.UpdatedDate = DateTime.UtcNow;
+
+                await monitoringDataRepository.UpdateAsync(existedMonitoringData);
+            }
+
+            foreach (NodeEvent nodeEvent in events)
+            {
+                await monitoringDataRepository.AddEventAsync(monitoringData.Id, nodeEvent);
+            }
+
+            dbContext.Commit();
         }
-        else
+        catch (Exception)
         {
-            existedMonitoringData.NodeName = monitoringData.NodeName;
-            existedMonitoringData.OperatingSystem = monitoringData.OperatingSystem;
-            existedMonitoringData.Version = monitoringData.Version;
-            existedMonitoringData.UpdatedDate = DateTime.UtcNow;
-
-            await monitoringDataRepository.UpdateAsync(existedMonitoringData);
+            dbContext.Rollback();
+            throw;
         }
     }
 

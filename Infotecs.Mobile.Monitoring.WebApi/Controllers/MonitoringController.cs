@@ -41,7 +41,7 @@ public class MonitoringController : Controller
 
             logger.LogInformation("Monitoring: {@Request}", request);
 
-            await monitoringService.AddOrUpdateAsync(monitoringData);
+            await monitoringService.AddOrUpdateAsync(monitoringData, request.Events);
 
             return Ok();
         }
