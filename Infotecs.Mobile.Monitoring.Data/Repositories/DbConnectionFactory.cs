@@ -1,20 +1,32 @@
 ﻿using System.Data;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
+using Infotecs.Mobile.Monitoring.Data.Migrations;
+using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace Infotecs.Mobile.Monitoring.Data.Repositories;
 
 /// <inheritdoc />
 public class DbConnectionFactory : IDbConnectionFactory
 {
-    private readonly Func<IDbConnection> connectionFactory;
+
+    private readonly IConfiguration configuration;
 
     /// <summary>
     /// Создает новый экземпляр класса <see cref="DbConnectionFactory"/> class.
     /// </summary>
-    /// <param name="connectionFactory">Функция создания нового подключения.</param>
-    public DbConnectionFactory(Func<IDbConnection> connectionFactory) =>
-        this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+    /// <param name="configuration">Конфигурация подключения к базе данных</param>
+    public DbConnectionFactory(IConfiguration configuration) => this.configuration = configuration;
 
     /// <inheritdoc/>
-    public IDbConnection CreateConnection() => connectionFactory();
+    public IDbConnection CreateConnection()
+    {
+        var builder = new NpgsqlConnectionStringBuilder(configuration.GetConnectionString(MigrationManager.ConnectionString));
+
+        var conn = new NpgsqlConnection(builder.ConnectionString);
+
+        conn.Open();
+
+        return conn;
+    }
 }

@@ -35,16 +35,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
 
         var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
 
-        var dbConnectionFactory = new DbConnectionFactory(() =>
-        {
-            var builder = new NpgsqlConnectionStringBuilder(config.GetConnectionString(MigrationManager.ConnectionString));
-
-            var conn = new NpgsqlConnection(builder.ConnectionString);
-
-            conn.Open();
-
-            return conn;
-        });
+        var dbConnectionFactory = new DbConnectionFactory(config);
 
         var dbContext = new DbContext(dbConnectionFactory);
 

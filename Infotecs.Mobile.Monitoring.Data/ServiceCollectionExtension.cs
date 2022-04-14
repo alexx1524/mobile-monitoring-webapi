@@ -32,20 +32,7 @@ public static class ServiceCollectionExtension
                 .WithGlobalConnectionString(configuration.GetConnectionString(MigrationManager.ConnectionString))
                 .ScanIn(Assembly.GetAssembly(typeof(MigrationManager))).For.Migrations());
 
-        serviceCollection.AddTransient<IDbConnectionFactory>(options =>
-        {
-            var builder = new NpgsqlConnectionStringBuilder(configuration.GetConnectionString("SqlConnection"));
-
-            return new DbConnectionFactory(() =>
-            {
-                var conn = new NpgsqlConnection(builder.ConnectionString);
-
-                conn.Open();
-
-                return conn;
-            });
-        });
-
+        serviceCollection.AddTransient<IDbConnectionFactory, DbConnectionFactory>();
         serviceCollection.AddScoped<IDbContext, DbContext>();
         serviceCollection.AddScoped<IMonitoringDataRepository, MonitoringDataRepository>();
 

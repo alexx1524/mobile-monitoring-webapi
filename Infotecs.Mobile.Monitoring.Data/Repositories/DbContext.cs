@@ -6,7 +6,7 @@ namespace Infotecs.Mobile.Monitoring.Data.Repositories;
 /// <summary>
 /// Контекст для работы с базой данных.
 /// </summary>
-public class DbContext : IDbContext
+public class DbContext : IDbContext, IDisposable
 {
     private readonly IDbConnectionFactory dbConnectionFactory;
 
@@ -75,4 +75,12 @@ public class DbContext : IDbContext
         transaction = null;
         unitOfWork = null;
     }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        connection?.Dispose();
+        transaction?.Dispose();
+    }
+
 }
