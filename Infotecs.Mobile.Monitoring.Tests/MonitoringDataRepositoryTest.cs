@@ -127,9 +127,9 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
         IEnumerable<MonitoringData> result = await repository.GetAllAsync();
 
         // Assert
-        result.Should().NotBeNull();
-        result.Should().NotBeEmpty();
-        result.Count().Should().Be(count);
+        result.Should()
+            .NotBeNullOrEmpty()
+            .And.HaveCount(count);
     }
 
     /// <summary>
@@ -165,24 +165,32 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// Тест проверяет, что метод GetEvents возвращает валидные данные для указанной ноды.
     /// </summary>
     /// <param name="monitoringData">Данные мониторинга ноды.</param>
-    /// <param name="nodeEvent">Ивент от ноды.</param>
+    /// <param name="count">Количество ивентов.</param>
     /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous unit test.</placeholder></returns>
     [Theory, AutoData]
-    public async Task GetEventsAsync_IfEventsExist_ShouldReturnValidEvents(MonitoringData monitoringData, NodeEvent nodeEvent)
+    public async Task GetEventsAsync_IfEventsExist_ShouldReturnValidEvents(MonitoringData monitoringData, byte count)
     {
         // Act
         await repository.CreateAsync(monitoringData);
-        await repository.AddEventAsync(monitoringData.Id, nodeEvent);
 
-        NodeEvent[] events = (await repository.GetEventsAsync(monitoringData.Id)).ToArray();
+        var fixture = new Fixture();
+
+        IEnumerable<NodeEvent>? events = fixture.CreateMany<NodeEvent>(count);
+
+        foreach (NodeEvent nodeEvent in events)
+        {
+            await repository.AddEventAsync(monitoringData.Id, nodeEvent);
+        }
+
+        NodeEvent[] result = (await repository.GetEventsAsync(monitoringData.Id)).ToArray();
 
         // Assert
-        events.Should().NotBeNull();
-        events.Should().NotBeEmpty();
-
-        nodeEvent.Should().BeEquivalentTo(events.First(), options => options
-            .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, new TimeSpan(1000)))
-            .WhenTypeIs<DateTime>());
+        result.Should()
+            .NotBeNullOrEmpty()
+            .And.HaveCount(count)
+            .And.BeEquivalentTo(events, options => options
+                .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, new TimeSpan(1000)))
+                .WhenTypeIs<DateTime>());
     }
 
     /// <inheritdoc />
