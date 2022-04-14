@@ -44,28 +44,13 @@ public class DbContext : IDbContext, IDisposable
             Rollback();
             throw;
         }
-        finally
-        {
-            Reset();
-        }
     }
 
     /// <inheritdoc />
-    public void Rollback()
-    {
-        try
-        {
-            UnitOfWork.Rollback();
-        }
-        finally
-        {
-            Reset();
-        }
-    }
+    public void Rollback() => UnitOfWork.Rollback();
 
-    private IDbConnection OpenConnection() => dbConnectionFactory.CreateConnection();
-
-    private void Reset()
+    /// <inheritdoc/>
+    public void Dispose()
     {
         Connection.Close();
         Connection.Dispose();
@@ -76,11 +61,6 @@ public class DbContext : IDbContext, IDisposable
         unitOfWork = null;
     }
 
-    /// <inheritdoc/>
-    public void Dispose()
-    {
-        connection?.Dispose();
-        transaction?.Dispose();
-    }
+    private IDbConnection OpenConnection() => dbConnectionFactory.CreateConnection();
 
 }

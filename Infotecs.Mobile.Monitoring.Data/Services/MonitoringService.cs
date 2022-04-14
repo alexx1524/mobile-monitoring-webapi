@@ -42,39 +42,29 @@ public class MonitoringService : IMonitoringService
             throw new ArgumentNullException(nameof(monitoringData));
         }
 
-        try
+        MonitoringData? existedMonitoringData = await monitoringDataRepository.GetByIdAsync(monitoringData.Id);
+
+        if (existedMonitoringData is null)
         {
-            MonitoringData? existedMonitoringData = await monitoringDataRepository.GetByIdAsync(monitoringData.Id);
+            monitoringData.CreatedDate =
+                monitoringData.UpdatedDate =
+                    DateTime.UtcNow;
 
-            if (existedMonitoringData is null)
-            {
-                monitoringData.CreatedDate =
-                    monitoringData.UpdatedDate =
-                        DateTime.UtcNow;
-
-                await monitoringDataRepository.CreateAsync(monitoringData);
-            }
-            else
-            {
-                existedMonitoringData.NodeName = monitoringData.NodeName;
-                existedMonitoringData.OperatingSystem = monitoringData.OperatingSystem;
-                existedMonitoringData.Version = monitoringData.Version;
-                existedMonitoringData.UpdatedDate = DateTime.UtcNow;
-
-                await monitoringDataRepository.UpdateAsync(existedMonitoringData);
-            }
-
-            foreach (NodeEvent nodeEvent in events)
-            {
-                await monitoringDataRepository.AddEventAsync(monitoringData.Id, nodeEvent);
-            }
-
-            dbContext.Commit();
+            await monitoringDataRepository.CreateAsync(monitoringData);
         }
-        catch (Exception)
+        else
         {
-            dbContext.Rollback();
-            throw;
+            existedMonitoringData.NodeName = monitoringData.NodeName;
+            existedMonitoringData.OperatingSystem = monitoringData.OperatingSystem;
+            existedMonitoringData.Version = monitoringData.Version;
+            existedMonitoringData.UpdatedDate = DateTime.UtcNow;
+
+            await monitoringDataRepository.UpdateAsync(existedMonitoringData);
+        }
+
+        foreach (NodeEvent nodeEvent in events)
+        {
+            await monitoringDataRepository.AddEventAsync(monitoringData.Id, nodeEvent);
         }
     }
 

@@ -1,4 +1,5 @@
 using Infotecs.Mobile.Monitoring.Core.Models;
+using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
 using Infotecs.Mobile.Monitoring.WebApi.Models;
 using Mapster;
@@ -13,16 +14,20 @@ namespace Infotecs.Mobile.Monitoring.WebApi.Controllers;
 [Route("monitoring")]
 public class MonitoringController : Controller
 {
+
+    private readonly IDbContext dbContext;
     private readonly ILogger<MonitoringController> logger;
     private readonly IMonitoringService monitoringService;
 
     /// <summary>
     /// Конструктор.
     /// </summary>
+    /// <param name="dbContext">Контекст для работы с базой данных.</param>
     /// <param name="logger">Интерфейс логгирования.</param>
     /// <param name="monitoringService">Интерфейс сервиса мониторинговых данных.</param>
-    public MonitoringController(ILogger<MonitoringController> logger, IMonitoringService monitoringService)
+    public MonitoringController(IDbContext dbContext, ILogger<MonitoringController> logger, IMonitoringService monitoringService)
     {
+        this.dbContext = dbContext;
         this.logger = logger;
         this.monitoringService = monitoringService;
     }
@@ -43,11 +48,16 @@ public class MonitoringController : Controller
 
             await monitoringService.AddOrUpdateAsync(monitoringData, request.Events);
 
+            dbContext.Commit();
+
             return Ok();
         }
         catch (Exception e)
         {
+            dbContext.Rollback();
+
             logger.LogError(e, "Ошибка сохранения данных мониторинга");
+
             throw;
         }
     }

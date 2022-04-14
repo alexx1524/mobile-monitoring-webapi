@@ -15,7 +15,7 @@ public class DbConnectionFactory : IDbConnectionFactory
     /// <summary>
     /// Создает новый экземпляр класса <see cref="DbConnectionFactory"/> class.
     /// </summary>
-    /// <param name="configuration">Конфигурация подключения к базе данных</param>
+    /// <param name="configuration">Конфигурация подключения к базе данных.</param>
     public DbConnectionFactory(IConfiguration configuration) => this.configuration = configuration;
 
     /// <inheritdoc/>
