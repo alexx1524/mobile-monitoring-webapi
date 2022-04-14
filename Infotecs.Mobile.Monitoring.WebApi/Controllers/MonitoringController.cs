@@ -15,7 +15,7 @@ namespace Infotecs.Mobile.Monitoring.WebApi.Controllers;
 public class MonitoringController : Controller
 {
 
-    private readonly IDbContext dbContext;
+    private readonly IUnitOfWork unitOfWork;
     private readonly ILogger<MonitoringController> logger;
     private readonly IMonitoringService monitoringService;
 
@@ -25,9 +25,9 @@ public class MonitoringController : Controller
     /// <param name="dbContext">Контекст для работы с базой данных.</param>
     /// <param name="logger">Интерфейс логгирования.</param>
     /// <param name="monitoringService">Интерфейс сервиса мониторинговых данных.</param>
-    public MonitoringController(IDbContext dbContext, ILogger<MonitoringController> logger, IMonitoringService monitoringService)
+    public MonitoringController(IUnitOfWork dbContext, ILogger<MonitoringController> logger, IMonitoringService monitoringService)
     {
-        this.dbContext = dbContext;
+        this.unitOfWork = dbContext;
         this.logger = logger;
         this.monitoringService = monitoringService;
     }
@@ -48,13 +48,13 @@ public class MonitoringController : Controller
 
             await monitoringService.AddOrUpdateAsync(monitoringData, request.Events);
 
-            dbContext.Commit();
+            unitOfWork.Commit();
 
             return Ok();
         }
         catch (Exception e)
         {
-            dbContext.Rollback();
+            unitOfWork.Rollback();
 
             logger.LogError(e, "Ошибка сохранения данных мониторинга");
 

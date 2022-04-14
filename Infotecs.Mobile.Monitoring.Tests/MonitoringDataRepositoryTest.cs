@@ -37,7 +37,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
 
         var dbConnectionFactory = new DbConnectionFactory(config);
 
-        var dbContext = new DbContext(dbConnectionFactory);
+        var dbContext = new UnitOfWork(dbConnectionFactory);
 
         repository = new MonitoringDataRepository(dbContext, loggerMock.Object);
     }

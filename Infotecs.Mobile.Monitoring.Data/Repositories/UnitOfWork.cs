@@ -1,21 +1,31 @@
-﻿using System.Data;
+using System.Data;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 
 namespace Infotecs.Mobile.Monitoring.Data.Repositories;
 
 /// <summary>
-/// Класс для выполнения транзаций в базу данных.
+/// Контекст для работы с базой данных.
 /// </summary>
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork : IUnitOfWork, IDisposable
 {
+    private readonly IDbConnectionFactory dbConnectionFactory;
+
+    private IDbConnection? connection;
+    private IDbTransaction? transaction;
+
     /// <summary>
-    /// Создает экземпляр класса <see cref="UnitOfWork"/> class.
+    /// Создает новый экземпляр класса <see cref="UnitOfWork"/> class.
     /// </summary>
-    /// <param name="transaction">Транзакция к базе данных.</param>
-    public UnitOfWork(IDbTransaction transaction) => Transaction = transaction;
+    /// <param name="dbConnectionFactory">Фабрика создания подключений к БД.</param>
+    public UnitOfWork(IDbConnectionFactory dbConnectionFactory) => this.dbConnectionFactory = dbConnectionFactory;
 
     /// <inheritdoc />
-    public IDbTransaction Transaction { get; }
+    public IDbConnection Connection =>
+        connection ??= OpenConnection();
+
+    /// <inheritdoc />
+    public IDbTransaction Transaction =>
+        transaction ??= Connection.BeginTransaction();
 
     /// <inheritdoc />
     public void Commit()
@@ -33,5 +43,18 @@ public class UnitOfWork : IUnitOfWork
 
     /// <inheritdoc />
     public void Rollback() => Transaction.Rollback();
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        Connection.Close();
+        Connection.Dispose();
+        Transaction.Dispose();
+
+        connection = null;
+        transaction = null;
+    }
+
+    private IDbConnection OpenConnection() => dbConnectionFactory.CreateConnection();
 
 }

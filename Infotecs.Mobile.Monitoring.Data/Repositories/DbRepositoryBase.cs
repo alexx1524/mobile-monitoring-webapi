@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 
 namespace Infotecs.Mobile.Monitoring.Data.Repositories;
@@ -11,13 +11,13 @@ public abstract class DbRepositoryBase
     /// <summary>
     /// Создание нового экземпляра класса <see cref="DbRepositoryBase"/> class.
     /// </summary>
-    /// <param name="dbContext">Контекст базы данных.</param>
-    protected DbRepositoryBase(IDbContext dbContext)
+    /// <param name="unitOfWork">Контекст базы данных.</param>
+    protected DbRepositoryBase(IUnitOfWork unitOfWork)
     {
-        Connection = dbContext.UnitOfWork.Transaction.Connection ??
-            throw new ArgumentException(nameof(dbContext.UnitOfWork.Transaction));
+        Connection = unitOfWork.Transaction.Connection ??
+            throw new ArgumentException(nameof(unitOfWork.Transaction));
 
-        Transaction = dbContext.UnitOfWork.Transaction;
+        Transaction = unitOfWork.Transaction;
     }
 
     /// <summary>

@@ -10,20 +10,16 @@ namespace Infotecs.Mobile.Monitoring.Data.Services;
 /// </summary>
 public class MonitoringService : IMonitoringService
 {
-
-    private readonly IDbContext dbContext;
     private readonly IMonitoringDataRepository monitoringDataRepository;
     private readonly ILogger<MonitoringService> logger;
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="dbContext">Контекст базы данных.</param>
     /// <param name="monitoringDataRepository">Репозиторий для работы с мониторингвыми данными.</param>
     /// <param name="logger">Интерфейс для логгирования.</param>
-    public MonitoringService(IDbContext dbContext, IMonitoringDataRepository monitoringDataRepository, ILogger<MonitoringService> logger)
+    public MonitoringService(IMonitoringDataRepository monitoringDataRepository, ILogger<MonitoringService> logger)
     {
-        this.dbContext = dbContext;
         this.monitoringDataRepository = monitoringDataRepository;
         this.logger = logger;
     }
@@ -128,5 +124,4 @@ public class MonitoringService : IMonitoringService
             }
         }
     }
-
 }

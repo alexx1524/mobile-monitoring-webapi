@@ -1,4 +1,4 @@
-﻿using Dapper;
+using Dapper;
 using FluentMigrator.Runner;
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Models.Sorting;
@@ -19,9 +19,9 @@ public class MonitoringDataRepository : DbRepositoryBase, IMonitoringDataReposit
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="dbContext">Контекст подключений к базе данных.</param>
+    /// <param name="unitOfWork">Контекст подключений к базе данных.</param>
     /// <param name="logger">Интерфейс логгирования.</param>
-    public MonitoringDataRepository(IDbContext dbContext, ILogger<MonitoringDataRepository> logger) : base(dbContext)
+    public MonitoringDataRepository(IUnitOfWork unitOfWork, ILogger<MonitoringDataRepository> logger) : base(unitOfWork)
         => this.logger = logger;
 
     /// <summary>

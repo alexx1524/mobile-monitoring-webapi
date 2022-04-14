@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using FluentMigrator.Runner;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
@@ -7,7 +7,6 @@ using Infotecs.Mobile.Monitoring.Data.Repositories;
 using Infotecs.Mobile.Monitoring.Data.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
 
 namespace Infotecs.Mobile.Monitoring.Data;
 
@@ -33,7 +32,7 @@ public static class ServiceCollectionExtension
                 .ScanIn(Assembly.GetAssembly(typeof(MigrationManager))).For.Migrations());
 
         serviceCollection.AddTransient<IDbConnectionFactory, DbConnectionFactory>();
-        serviceCollection.AddScoped<IDbContext, DbContext>();
+        serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
         serviceCollection.AddScoped<IMonitoringDataRepository, MonitoringDataRepository>();
 
         serviceCollection.AddTransient<IMonitoringService, MonitoringService>();

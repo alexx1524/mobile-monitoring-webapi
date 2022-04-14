@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 
 namespace Infotecs.Mobile.Monitoring.Core.Repositories;
 
@@ -7,6 +7,11 @@ namespace Infotecs.Mobile.Monitoring.Core.Repositories;
 /// </summary>
 public interface IUnitOfWork
 {
+    /// <summary>
+    /// Подключение к базе данных.
+    /// </summary>
+    public IDbConnection Connection { get; }
+
     /// <summary>
     /// Транзакция к базе данных.
     /// </summary>
