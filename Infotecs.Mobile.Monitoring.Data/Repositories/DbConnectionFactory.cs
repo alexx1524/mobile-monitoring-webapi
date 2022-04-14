@@ -16,5 +16,5 @@ public class DbConnectionFactory : IDbConnectionFactory
         this.connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
 
     /// <inheritdoc/>
-    public IDbConnection CreateOpenConnection() => connectionFactory();
+    public IDbConnection CreateConnection() => connectionFactory();
 }

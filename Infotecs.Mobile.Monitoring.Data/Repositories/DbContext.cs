@@ -63,7 +63,7 @@ public class DbContext : IDbContext
         }
     }
 
-    private IDbConnection OpenConnection() => dbConnectionFactory.CreateOpenConnection();
+    private IDbConnection OpenConnection() => dbConnectionFactory.CreateConnection();
 
     private void Reset()
     {

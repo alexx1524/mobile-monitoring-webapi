@@ -11,5 +11,5 @@ public interface IDbConnectionFactory
     /// Создает и открывает новое подключение к базе данных.
     /// </summary>
     /// <returns>Открытое подключение к базе данных.</returns>
-    IDbConnection CreateOpenConnection();
+    IDbConnection CreateConnection();
 }
