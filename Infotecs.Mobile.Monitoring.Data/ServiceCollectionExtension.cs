@@ -1,8 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using FluentMigrator.Runner;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
-using Infotecs.Mobile.Monitoring.Data.Context;
 using Infotecs.Mobile.Monitoring.Data.Migrations;
 using Infotecs.Mobile.Monitoring.Data.Repositories;
 using Infotecs.Mobile.Monitoring.Data.Services;
@@ -29,11 +28,11 @@ public static class ServiceCollectionExtension
             .AddLogging(c => c.AddFluentMigratorConsole())
             .AddFluentMigratorCore()
             .ConfigureRunner(c => c.AddPostgres()
-                .WithGlobalConnectionString(configuration.GetConnectionString(DapperContext.ConnectionString))
+                .WithGlobalConnectionString(configuration.GetConnectionString(MigrationManager.ConnectionString))
                 .ScanIn(Assembly.GetAssembly(typeof(MigrationManager))).For.Migrations());
 
-        serviceCollection.AddSingleton<DapperContext>();
-
+        serviceCollection.AddTransient<IDbConnectionFactory, DbConnectionFactory>();
+        serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
         serviceCollection.AddScoped<IMonitoringDataRepository, MonitoringDataRepository>();
 
         serviceCollection.AddTransient<IMonitoringService, MonitoringService>();

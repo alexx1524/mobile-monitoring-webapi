@@ -1,4 +1,4 @@
-﻿using Infotecs.Mobile.Monitoring.Core.Models;
+using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
 using Microsoft.Extensions.Logging;
@@ -28,11 +28,12 @@ public class MonitoringService : IMonitoringService
     /// Создание или обновление данных мониторинга.
     /// </summary>
     /// <param name="monitoringData">Данные мониторинга.</param>
+    /// <param name="events">Список ивентов.</param>
     /// <exception cref="ArgumentNullException">Исключение вызывается, если мониторингавые данные или идентификатор устроства равны Null или пустой строке.</exception>
     /// <returns>Задача.</returns>
-    public async Task AddOrUpdateAsync(MonitoringData monitoringData)
+    public async Task AddOrUpdateAsync(MonitoringData monitoringData, IEnumerable<NodeEvent> events)
     {
-        if (string.IsNullOrEmpty(monitoringData?.Id))
+        if (string.IsNullOrEmpty(monitoringData.Id))
         {
             throw new ArgumentNullException(nameof(monitoringData));
         }
@@ -55,6 +56,11 @@ public class MonitoringService : IMonitoringService
             existedMonitoringData.UpdatedDate = DateTime.UtcNow;
 
             await monitoringDataRepository.UpdateAsync(existedMonitoringData);
+        }
+
+        foreach (NodeEvent nodeEvent in events)
+        {
+            await monitoringDataRepository.AddEventAsync(monitoringData.Id, nodeEvent);
         }
     }
 
@@ -118,5 +124,4 @@ public class MonitoringService : IMonitoringService
             }
         }
     }
-
 }

@@ -1,4 +1,7 @@
-﻿namespace Infotecs.Mobile.Monitoring.WebApi.Models;
+﻿using System.Runtime.InteropServices;
+using Infotecs.Mobile.Monitoring.Core.Models;
+
+namespace Infotecs.Mobile.Monitoring.WebApi.Models;
 
 /// <summary>
 /// Запрос на добавление данных мониторинга.
@@ -24,5 +27,10 @@ public class AddMonitoringDataRequest
     /// Версия клиента.
     /// </summary>
     public string? Version { get; set; }
+
+    /// <summary>
+    /// Список ивентов от ноды.
+    /// </summary>
+    public IEnumerable<NodeEvent> Events { get; set; } = Array.Empty<NodeEvent>();
 
 }

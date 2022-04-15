@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-using FluentMigrator.Runner;
-using Infotecs.Mobile.Monitoring.Data.Context;
+﻿using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,6 +12,16 @@ namespace Infotecs.Mobile.Monitoring.Data.Migrations;
 /// </summary>
 public static class MigrationManager
 {
+    /// <summary>
+    /// Строка подключения к базе данных для выполнения запросов.
+    /// </summary>
+    public static string ConnectionString = "SqlConnection";
+
+    /// <summary>
+    /// Строка подключения к базе данных для создания.
+    /// </summary>
+    public static string AdminConnectionString = "AdminSqlConnection";
+
     /// <summary>
     /// Метод выполнения миграции базы данных.
     /// </summary>
@@ -32,8 +40,8 @@ public static class MigrationManager
 
         try
         {
-            string? connectionString = configuration.GetConnectionString(DapperContext.ConnectionString);
-            string? adminConnectionString = configuration.GetConnectionString(DapperContext.AdminConnectionString);
+            string? connectionString = configuration.GetConnectionString(ConnectionString);
+            string? adminConnectionString = configuration.GetConnectionString(AdminConnectionString);
 
             string databaseName = ExtractDatabaseName(connectionString);
 

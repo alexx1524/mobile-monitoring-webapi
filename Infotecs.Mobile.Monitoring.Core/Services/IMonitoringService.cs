@@ -11,8 +11,9 @@ public interface IMonitoringService
     /// Создание новой записи или обновление существующей записи.
     /// </summary>
     /// <param name="monitoringData">Данные мониторинга.</param>
+    /// <param name="events">Список ивентов от ноды.</param>
     /// <returns>Задача.</returns>
-    Task AddOrUpdateAsync(MonitoringData monitoringData);
+    Task AddOrUpdateAsync(MonitoringData monitoringData, IEnumerable<NodeEvent> events);
 
     /// <summary>
     /// Получение данных мониторинга по идентификатору устройства.

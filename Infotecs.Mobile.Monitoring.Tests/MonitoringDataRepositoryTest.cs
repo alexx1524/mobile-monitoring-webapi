@@ -8,7 +8,7 @@ using AutoFixture.Xunit2;
 using Dapper;
 using FluentAssertions;
 using Infotecs.Mobile.Monitoring.Core.Models;
-using Infotecs.Mobile.Monitoring.Data.Context;
+using Infotecs.Mobile.Monitoring.Data.Migrations;
 using Infotecs.Mobile.Monitoring.Data.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -33,10 +33,13 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     {
         config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
-        var context = new DapperContext(config);
         var loggerMock = new Mock<ILogger<MonitoringDataRepository>>();
 
-        repository = new MonitoringDataRepository(context, loggerMock.Object);
+        var dbConnectionFactory = new DbConnectionFactory(config);
+
+        var dbContext = new UnitOfWork(dbConnectionFactory);
+
+        repository = new MonitoringDataRepository(dbContext, loggerMock.Object);
     }
 
     /// <summary>
@@ -65,7 +68,8 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
         // Act
         await repository.CreateAsync(monitoringData);
 
-        MonitoringData? result = await repository.GetByIdAsync(monitoringData.Id);
+        MonitoringData? result = await repository.GetByIdAsync(monitoringData.Id ??
+            throw new ArgumentException(nameof(monitoringData)));
 
         // Assert
         result.Should().NotBeNull();
@@ -77,6 +81,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     /// <summary>
     /// Проверка успешного обновления мониторинговых данных.
     /// </summary>
+    /// <param name="monitoringData">Данные мониторинга.</param>
     /// <returns>Задача.</returns>
     [Theory, AutoData]
     public async Task UpdateAsync_IfDataIsValid_ShouldSuccessfullyUpdate(MonitoringData monitoringData)
@@ -92,7 +97,8 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
 
         await repository.UpdateAsync(monitoringData);
 
-        MonitoringData? result = await repository.GetByIdAsync(monitoringData.Id);
+        MonitoringData? result = await repository.GetByIdAsync(monitoringData.Id ??
+            throw new ArgumentException(nameof(monitoringData)));
 
         // Assert
         result.Should().NotBeNull();
@@ -175,14 +181,16 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
 
         var fixture = new Fixture();
 
-        IEnumerable<NodeEvent>? events = fixture.CreateMany<NodeEvent>(count);
+        IEnumerable<NodeEvent> events = fixture.CreateMany<NodeEvent>(count).ToArray();
 
         foreach (NodeEvent nodeEvent in events)
         {
-            await repository.AddEventAsync(monitoringData.Id, nodeEvent);
+            await repository.AddEventAsync(monitoringData.Id ??
+                throw new ArgumentException(nameof(monitoringData)), nodeEvent);
         }
 
-        NodeEvent[] result = (await repository.GetEventsAsync(monitoringData.Id)).ToArray();
+        NodeEvent[] result = (await repository.GetEventsAsync(monitoringData.Id ??
+            throw new ArgumentException(nameof(monitoringData)))).ToArray();
 
         // Assert
         result.Should()
@@ -201,7 +209,7 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
 
     private async Task ClearData()
     {
-        string? connectionString = config.GetConnectionString(DapperContext.ConnectionString);
+        string? connectionString = config.GetConnectionString(MigrationManager.ConnectionString);
         using IDbConnection connection = new NpgsqlConnection(connectionString);
 
         await connection.ExecuteAsync("DELETE FROM node_events;");
