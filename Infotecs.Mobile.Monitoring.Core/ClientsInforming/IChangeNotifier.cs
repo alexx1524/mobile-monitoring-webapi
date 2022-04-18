@@ -11,6 +11,6 @@ public interface IChangeNotifier
     /// Метод отправки данных о ноде (устройстве).
     /// </summary>
     /// <param name="monitoringData">Мониторинговые данные.</param>
-    /// <returns>Мониторинговые данные.</returns>
+    /// <returns>Задача.</returns>
     public Task SendNewMonitoringDataAsync(MonitoringData monitoringData);
 }
