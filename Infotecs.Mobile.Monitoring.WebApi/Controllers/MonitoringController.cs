@@ -1,3 +1,4 @@
+using Infotecs.Mobile.Monitoring.Core.ClientsInforming;
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
@@ -18,6 +19,7 @@ public class MonitoringController : Controller
     private readonly IUnitOfWork unitOfWork;
     private readonly ILogger<MonitoringController> logger;
     private readonly IMonitoringService monitoringService;
+    private readonly IChangeNotifier changeNotifier;
 
     /// <summary>
     /// Конструктор.
@@ -25,11 +27,16 @@ public class MonitoringController : Controller
     /// <param name="dbContext">Контекст для работы с базой данных.</param>
     /// <param name="logger">Интерфейс логгирования.</param>
     /// <param name="monitoringService">Интерфейс сервиса мониторинговых данных.</param>
-    public MonitoringController(IUnitOfWork dbContext, ILogger<MonitoringController> logger, IMonitoringService monitoringService)
+    /// <param name="changeNotifier">Интерфейс для информирования об изменении данных на сервере.</param>
+    public MonitoringController(IUnitOfWork dbContext,
+        ILogger<MonitoringController> logger,
+        IMonitoringService monitoringService,
+        IChangeNotifier changeNotifier)
     {
         this.unitOfWork = dbContext;
         this.logger = logger;
         this.monitoringService = monitoringService;
+        this.changeNotifier = changeNotifier;
     }
 
     /// <summary>
@@ -49,6 +56,8 @@ public class MonitoringController : Controller
             await monitoringService.AddOrUpdateAsync(monitoringData, request.Events);
 
             unitOfWork.Commit();
+
+            await changeNotifier.SendNewMonitoringDataAsync(monitoringData);
 
             return Ok();
         }

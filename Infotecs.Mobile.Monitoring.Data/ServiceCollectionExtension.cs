@@ -1,7 +1,9 @@
 using System.Reflection;
 using FluentMigrator.Runner;
+using Infotecs.Mobile.Monitoring.Core.ClientsInforming;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
+using Infotecs.Mobile.Monitoring.Data.Hubs;
 using Infotecs.Mobile.Monitoring.Data.Migrations;
 using Infotecs.Mobile.Monitoring.Data.Repositories;
 using Infotecs.Mobile.Monitoring.Data.Services;
@@ -36,6 +38,7 @@ public static class ServiceCollectionExtension
         serviceCollection.AddScoped<IMonitoringDataRepository, MonitoringDataRepository>();
 
         serviceCollection.AddTransient<IMonitoringService, MonitoringService>();
+        serviceCollection.AddTransient<IChangeNotifier, ChangeNotifier>();
 
         return serviceCollection;
     }

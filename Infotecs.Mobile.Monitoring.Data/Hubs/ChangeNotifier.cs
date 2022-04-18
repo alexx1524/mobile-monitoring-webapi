@@ -1,8 +1,9 @@
-﻿using Infotecs.Mobile.Monitoring.Core.ClientsInforming;
+using Infotecs.Mobile.Monitoring.Core.ClientsInforming;
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
-namespace Infotecs.Mobile.Monitoring.WebApi.Hubs;
+namespace Infotecs.Mobile.Monitoring.Data.Hubs;
 
 /// <summary>
 /// Класс для информирования клиентов об изменениях на сервере.

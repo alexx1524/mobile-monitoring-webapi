@@ -1,4 +1,3 @@
-using Infotecs.Mobile.Monitoring.Core.ClientsInforming;
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
@@ -13,20 +12,16 @@ public class MonitoringService : IMonitoringService
 {
     private readonly IMonitoringDataRepository monitoringDataRepository;
     private readonly ILogger<MonitoringService> logger;
-    private readonly IChangeNotifier changeNotifier;
 
     /// <summary>
     /// Конструктор.
     /// </summary>
     /// <param name="monitoringDataRepository">Репозиторий для работы с мониторингвыми данными.</param>
     /// <param name="logger">Интерфейс для логгирования.</param>
-    /// <param name="changeNotifier">Интерфейс для информирования о изменении данных на сервере.</param>
-    public MonitoringService(IMonitoringDataRepository monitoringDataRepository, ILogger<MonitoringService> logger,
-        IChangeNotifier changeNotifier)
+    public MonitoringService(IMonitoringDataRepository monitoringDataRepository, ILogger<MonitoringService> logger)
     {
         this.monitoringDataRepository = monitoringDataRepository;
         this.logger = logger;
-        this.changeNotifier = changeNotifier;
     }
 
     /// <summary>
@@ -52,8 +47,6 @@ public class MonitoringService : IMonitoringService
                     DateTime.UtcNow;
 
             await monitoringDataRepository.CreateAsync(monitoringData);
-
-            await changeNotifier.SendNewMonitoringDataAsync(monitoringData);
         }
         else
         {
