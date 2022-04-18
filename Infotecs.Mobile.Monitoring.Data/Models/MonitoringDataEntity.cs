@@ -25,7 +25,7 @@ public class MonitoringDataEntity
     /// <summary>
     /// Версия клиента.
     /// </summary>
-    public string? Version { get; set; } = null!;
+    public string Version { get; set; } = null!;
 
     /// <summary>
     /// Дата/время создания мониторинговых данных.
