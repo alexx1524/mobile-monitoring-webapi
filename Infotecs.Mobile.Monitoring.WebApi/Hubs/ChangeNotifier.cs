@@ -24,7 +24,7 @@ public class ChangeNotifier : IChangeNotifier
     }
 
     /// <inheritdoc/>
-    public async Task SendNewMonitoringData(MonitoringData monitoringData) {
+    public async Task SendNewMonitoringDataAsync(MonitoringData monitoringData) {
         try
         {
             await hubContext.Clients.All.SendAsync("onNewMonitoringDataAdded", monitoringData);

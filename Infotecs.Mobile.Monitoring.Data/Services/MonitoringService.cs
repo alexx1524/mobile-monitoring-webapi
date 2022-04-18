@@ -53,7 +53,7 @@ public class MonitoringService : IMonitoringService
 
             await monitoringDataRepository.CreateAsync(monitoringData);
 
-            await changeNotifier.SendNewMonitoringData(monitoringData);
+            await changeNotifier.SendNewMonitoringDataAsync(monitoringData);
         }
         else
         {

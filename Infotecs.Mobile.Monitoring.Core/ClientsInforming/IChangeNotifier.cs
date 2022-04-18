@@ -12,5 +12,5 @@ public interface IChangeNotifier
     /// </summary>
     /// <param name="monitoringData">Мониторинговые данные.</param>
     /// <returns>Мониторинговые данные.</returns>
-    public Task SendNewMonitoringData(MonitoringData monitoringData);
+    public Task SendNewMonitoringDataAsync(MonitoringData monitoringData);
 }
