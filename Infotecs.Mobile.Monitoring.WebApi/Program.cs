@@ -1,6 +1,8 @@
 using System.Reflection;
 using FluentValidation.AspNetCore;
+using Infotecs.Mobile.Monitoring.Core.ClientsInforming;
 using Infotecs.Mobile.Monitoring.Data;
+using Infotecs.Mobile.Monitoring.Data.Hubs;
 using Infotecs.Mobile.Monitoring.Data.Migrations;
 using Infotecs.Mobile.Monitoring.WebApi.Validators;
 using Microsoft.OpenApi.Models;
@@ -39,6 +41,9 @@ builder.Logging.AddSerilog(logger);
 // Add Data services
 builder.Services.AddDataServices(builder.Configuration);
 
+// Add SingalR
+builder.Services.AddSignalR();
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -62,5 +67,7 @@ app.UseCors(x => x
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<MonitoringDataHub>("/monitoring-data");
 
 app.MigrateDatabase<Program>().Run();
