@@ -1,22 +1,22 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+FROM mcr.microsoft.com/dotnet/core/aspnet:6.0 as BASE
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+RUN apt-get update
+RUN apt-get install -y nginx
+
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["Infotecs.Mobile.Monitoring.WebApi/Infotecs.Mobile.Monitoring.WebApi.csproj", "Infotecs.Mobile.Monitoring.WebApi/"]
-RUN dotnet restore "Infotecs.Mobile.Monitoring.WebApi/Infotecs.Mobile.Monitoring.WebApi.csproj"
-COPY . .
-WORKDIR "/src/Infotecs.Mobile.Monitoring.WebApi"
-RUN dotnet build "Infotecs.Mobile.Monitoring.WebApi.csproj" -c Release -o /app/build
+COPY bin/Release/net6.0/publish .
 
-FROM build AS publish
-RUN dotnet publish "Infotecs.Mobile.Monitoring.WebApi.csproj" -c Release -o /app/publish
+COPY ./startup.sh .
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Infotecs.Mobile.Monitoring.WebApi.dll"]
+RUN chmod 755 /app/startup.sh
+
+RUN rm /etc/nginx/nginx.conf
+
+COPY nginx.conf /etc/nginx
+
+ENV ASPNETCORE_URLS http://+:5000
+
+EXPOSE 5000 80
+
+CMD ["sh", "/app/startup.sh"]
