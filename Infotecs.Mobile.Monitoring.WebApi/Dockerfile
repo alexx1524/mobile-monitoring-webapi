@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:6.0 as BASE
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 as BASE
 
 RUN apt-get update
 RUN apt-get install -y nginx
