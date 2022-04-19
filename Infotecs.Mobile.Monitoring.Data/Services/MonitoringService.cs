@@ -30,8 +30,8 @@ public class MonitoringService : IMonitoringService
     /// <param name="monitoringData">Данные мониторинга.</param>
     /// <param name="events">Список ивентов.</param>
     /// <exception cref="ArgumentNullException">Исключение вызывается, если мониторингавые данные или идентификатор устроства равны Null или пустой строке.</exception>
-    /// <returns>Задача.</returns>
-    public async Task AddOrUpdateAsync(MonitoringData monitoringData, IEnumerable<NodeEvent> events)
+    /// <returns>Задача возвращает true, если был добавлена новая нода (устройство).</returns>
+    public async Task<bool> AddOrUpdateAsync(MonitoringData monitoringData, IEnumerable<NodeEvent> events)
     {
         if (string.IsNullOrEmpty(monitoringData.Id))
         {
@@ -62,6 +62,8 @@ public class MonitoringService : IMonitoringService
         {
             await monitoringDataRepository.AddEventAsync(monitoringData.Id, nodeEvent);
         }
+
+        return existedMonitoringData is null;
     }
 
     /// <summary>

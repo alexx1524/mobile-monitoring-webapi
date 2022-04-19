@@ -53,11 +53,14 @@ public class MonitoringController : Controller
 
             logger.LogInformation("Monitoring: {@Request}", request);
 
-            await monitoringService.AddOrUpdateAsync(monitoringData, request.Events);
+            bool isCreated = await monitoringService.AddOrUpdateAsync(monitoringData, request.Events);
 
             unitOfWork.Commit();
 
-            await changeNotifier.SendNewMonitoringDataAsync(monitoringData);
+            if (isCreated)
+            {
+                await changeNotifier.SendNewMonitoringDataAsync(monitoringData);
+            }
 
             return Ok();
         }
