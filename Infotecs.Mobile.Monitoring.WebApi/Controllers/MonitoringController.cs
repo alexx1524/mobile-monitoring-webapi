@@ -16,6 +16,20 @@ namespace Infotecs.Mobile.Monitoring.WebApi.Controllers;
 [Route("monitoring")]
 public class MonitoringController : Controller
 {
+    private static readonly TypeAdapterConfig successMappingConfig = TypeAdapterConfig<(AddNodeEventRequest, string), NodeEvent>
+        .NewConfig()
+        .Map(dest => dest.NodeId, src => src.Item2)
+        .Map(dest => dest.Name, src => src.Item1.Name)
+        .Map(dest => dest.Date, src => src.Item1.Date)
+        .Config;
+
+    private static readonly TypeAdapterConfig errorMappingConfig = TypeAdapterConfig<(AddNodeEventRequest, string, string), UnprocessedNodeEventMessage>
+        .NewConfig()
+        .Map(dest => dest.NodeId, src => src.Item2)
+        .Map(dest => dest.Name, src => src.Item1.Name)
+        .Map(dest => dest.Date, src => src.Item1.Date)
+        .Map(dest => dest.ErrorMessage, src => src.Item3)
+        .Config;
 
     private readonly IUnitOfWork unitOfWork;
     private readonly ILogger<MonitoringController> logger;
@@ -75,21 +89,6 @@ public class MonitoringController : Controller
 
             throw;
         }
-
-        TypeAdapterConfig successMappingConfig = TypeAdapterConfig<(AddNodeEventRequest, string), NodeEvent>
-            .NewConfig()
-            .Map(dest => dest.NodeId, src => src.Item2)
-            .Map(dest => dest.Name, src => src.Item1.Name)
-            .Map(dest => dest.Date, src => src.Item1.Date)
-            .Config;
-
-        TypeAdapterConfig errorMappingConfig = TypeAdapterConfig<(AddNodeEventRequest, string, string), UnprocessedNodeEventMessage>
-            .NewConfig()
-            .Map(dest => dest.NodeId, src => src.Item2)
-            .Map(dest => dest.Name, src => src.Item1.Name)
-            .Map(dest => dest.Date, src => src.Item1.Date)
-            .Map(dest => dest.ErrorMessage, src => src.Item3)
-            .Config;
 
         foreach (AddNodeEventRequest nodeEventRequest in request.Events)
         {
