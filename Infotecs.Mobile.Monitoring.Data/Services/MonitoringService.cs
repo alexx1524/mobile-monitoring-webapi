@@ -28,10 +28,9 @@ public class MonitoringService : IMonitoringService
     /// Создание или обновление данных мониторинга.
     /// </summary>
     /// <param name="monitoringData">Данные мониторинга.</param>
-    /// <param name="events">Список ивентов.</param>
     /// <exception cref="ArgumentNullException">Исключение вызывается, если мониторингавые данные или идентификатор устроства равны Null или пустой строке.</exception>
     /// <returns>Задача возвращает true, если был добавлена новая нода (устройство).</returns>
-    public async Task<bool> AddOrUpdateAsync(MonitoringData monitoringData, IEnumerable<NodeEvent> events)
+    public async Task<bool> AddOrUpdateAsync(MonitoringData monitoringData)
     {
         if (string.IsNullOrEmpty(monitoringData.Id))
         {
@@ -56,11 +55,6 @@ public class MonitoringService : IMonitoringService
             existedMonitoringData.UpdatedDate = DateTime.UtcNow;
 
             await monitoringDataRepository.UpdateAsync(existedMonitoringData);
-        }
-
-        foreach (NodeEvent nodeEvent in events)
-        {
-            await monitoringDataRepository.AddEventAsync(monitoringData.Id, nodeEvent);
         }
 
         return existedMonitoringData is null;
@@ -102,28 +96,13 @@ public class MonitoringService : IMonitoringService
     /// </summary>
     /// <param name="nodeId">Идентификатор ноды (устройства).</param>
     /// <returns>Список ивентов.</returns>
-    public Task<IEnumerable<NodeEvent>> GetNodeEvents(string nodeId) => monitoringDataRepository.GetEventsAsync(nodeId);
+    public Task<IEnumerable<NodeEvent>> GetNodeEventsAsync(string nodeId) => monitoringDataRepository.GetEventsAsync(nodeId);
 
     /// <summary>
     /// Добавление ивентов от ноды (устройства).
     /// </summary>
-    /// <param name="nodeId">Идентификатор ноды.</param>
-    /// <param name="events">Ивенты от ноды (устройства).</param>
+    /// <param name="nodeEvent">Ивент от ноды (устройства).</param>
     /// <returns>Задача.</returns>
-    public async Task AddEvents(string nodeId, IEnumerable<NodeEvent> events)
-    {
-        foreach (NodeEvent nodeEvent in events)
-        {
-            try
-            {
-                logger.LogInformation("Ивент {@NodeEvent}", nodeEvent);
-
-                await monitoringDataRepository.AddEventAsync(nodeId, nodeEvent);
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Ошибка сохранения ивента {@NodeEvent}", nodeEvent);
-            }
-        }
-    }
+    public Task<NodeEvent> AddEventAsync(NodeEvent nodeEvent)
+        => monitoringDataRepository.AddEventAsync(nodeEvent);
 }

@@ -11,9 +11,8 @@ public interface IMonitoringService
     /// Создание новой записи или обновление существующей записи.
     /// </summary>
     /// <param name="monitoringData">Данные мониторинга.</param>
-    /// <param name="events">Список ивентов от ноды.</param>
     /// <returns>Задача возвращает true, если был добавлена новая нода (устройство).</returns>
-    Task<bool> AddOrUpdateAsync(MonitoringData monitoringData, IEnumerable<NodeEvent> events);
+    Task<bool> AddOrUpdateAsync(MonitoringData monitoringData);
 
     /// <summary>
     /// Получение данных мониторинга по идентификатору устройства.
@@ -40,14 +39,13 @@ public interface IMonitoringService
     /// </summary>
     /// <param name="nodeId">Идентификатор ноды (устройства).</param>
     /// <returns>Список ивенонтов для ноды (устройства).</returns>
-    Task<IEnumerable<NodeEvent>> GetNodeEvents(string nodeId);
+    Task<IEnumerable<NodeEvent>> GetNodeEventsAsync(string nodeId);
 
     /// <summary>
     /// Добавление ивентов от ноды.
     /// </summary>
-    /// <param name="nodeId">Идентификатор ноды.</param>
-    /// <param name="events">Список ивентов.</param>
-    /// <returns>Задача.</returns>
-    Task AddEvents(string nodeId, IEnumerable<NodeEvent> events);
+    /// <param name="nodeEvent">Ивент от ноды (устройства).</param>
+    /// <returns>Задача, возвращаюшая идентификатор добавленной записи.</returns>
+    Task<NodeEvent> AddEventAsync(NodeEvent nodeEvent);
 
 }

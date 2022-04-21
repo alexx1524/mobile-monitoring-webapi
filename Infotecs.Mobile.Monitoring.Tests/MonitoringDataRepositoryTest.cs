@@ -162,7 +162,9 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
     public async Task AddEventAsync_IfNodeDoesntExist_ShouldThrowPostgresException(NodeEvent nodeEvent)
     {
         // Assert
-        Func<Task> act = async () => { await repository.AddEventAsync("non-existent identifier", nodeEvent); };
+        nodeEvent.NodeId = "non-existent identifier";
+
+        Func<Task> act = async () => { await repository.AddEventAsync(nodeEvent); };
 
         await act.Should().ThrowAsync<PostgresException>();
     }
@@ -185,8 +187,9 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
 
         foreach (NodeEvent nodeEvent in events)
         {
-            await repository.AddEventAsync(monitoringData.Id ??
-                throw new ArgumentException(nameof(monitoringData)), nodeEvent);
+            nodeEvent.NodeId = monitoringData.Id ?? throw new ArgumentException(nameof(monitoringData.Id));
+
+            await repository.AddEventAsync(nodeEvent);
         }
 
         NodeEvent[] result = (await repository.GetEventsAsync(monitoringData.Id ??
@@ -198,7 +201,8 @@ public class MonitoringDataRepositoryTest : IAsyncLifetime
             .And.HaveCount(count)
             .And.BeEquivalentTo(events, options => options
                 .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, new TimeSpan(1000)))
-                .WhenTypeIs<DateTime>());
+                .WhenTypeIs<DateTime>()
+                .Excluding(o => o.EventId));
     }
 
     /// <inheritdoc />

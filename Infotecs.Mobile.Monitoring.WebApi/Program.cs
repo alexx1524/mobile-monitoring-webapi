@@ -1,6 +1,5 @@
 using System.Reflection;
 using FluentValidation.AspNetCore;
-using Infotecs.Mobile.Monitoring.Core.ClientsInforming;
 using Infotecs.Mobile.Monitoring.Data;
 using Infotecs.Mobile.Monitoring.Data.Hubs;
 using Infotecs.Mobile.Monitoring.Data.Migrations;

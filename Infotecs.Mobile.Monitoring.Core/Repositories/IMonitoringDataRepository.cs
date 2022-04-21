@@ -51,9 +51,8 @@ public interface IMonitoringDataRepository
     /// <summary>
     /// Добавление ивентов от ноды (устройства).
     /// </summary>
-    /// <param name="nodeId">Идентификатор ноды.</param>
     /// <param name="nodeEvent">Ивент.</param>
     /// <returns>Задача.</returns>
-    Task AddEventAsync(string nodeId, NodeEvent nodeEvent);
+    Task<NodeEvent> AddEventAsync(NodeEvent nodeEvent);
 
 }
