@@ -1,6 +1,9 @@
-﻿using Infotecs.Mobile.Monitoring.Core.Models;
+﻿using Infotecs.Mobile.Monitoring.Core.Messages;
+using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
+using Infotecs.Mobile.Monitoring.WebApi.Models;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Infotecs.Mobile.Monitoring.WebApi.Controllers;
@@ -16,6 +19,7 @@ public class NodeEventController : Controller
     private readonly IMonitoringService monitoringService;
     private readonly ILogger<NodeEventController> logger;
     private readonly IUnitOfWork unitOfWork;
+    private readonly IMessagePublisher messagePublisher;
 
     /// <summary>
     /// Конструктор класса.
@@ -23,40 +27,16 @@ public class NodeEventController : Controller
     /// <param name="monitoringService">Интерфейс сервиса мониторинга.</param>
     /// <param name="logger">Интерфейс логгирования.</param>
     /// <param name="unitOfWork">Интерфейс управления транзакицями.</param>
+    /// <param name="messagePublisher">Интерфейс для публикации сообщений о статусе обработки ивентов.</param>
     public NodeEventController(IMonitoringService monitoringService,
         ILogger<NodeEventController> logger,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IMessagePublisher messagePublisher)
     {
         this.monitoringService = monitoringService;
         this.logger = logger;
         this.unitOfWork = unitOfWork;
-    }
-
-    /// <summary>
-    /// Добавление ивентов ноды (устройства).
-    /// </summary>
-    /// <param name="nodeId">Идентификатор ноды.</param>
-    /// <param name="events">Список ивентов от ноды.</param>
-    /// <returns>Статус выполнения.</returns>
-    [HttpPost]
-    [Route("{nodeId}")]
-    public async Task<ActionResult> AddEventAsync([FromRoute] string nodeId, [FromBody] IEnumerable<NodeEvent> events)
-    {
-
-        try
-        {
-            await monitoringService.AddEvents(nodeId, events);
-
-            unitOfWork.Commit();
-        }
-        catch (Exception)
-        {
-            unitOfWork.Rollback();
-
-            throw;
-        }
-
-        return NoContent();
+        this.messagePublisher = messagePublisher;
     }
 
     /// <summary>
@@ -68,8 +48,9 @@ public class NodeEventController : Controller
     [Route("bynode/{nodeId}")]
     public async Task<ActionResult<IEnumerable<NodeEvent>>> GetEventsByNodeIdAsync(string nodeId)
     {
-        IEnumerable<NodeEvent> events = await monitoringService.GetNodeEvents(nodeId);
+        IEnumerable<NodeEvent> events = await monitoringService.GetNodeEventsAsync(nodeId);
 
         return Ok(events);
     }
+
 }
