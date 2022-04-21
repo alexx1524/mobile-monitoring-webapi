@@ -33,6 +33,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         try
         {
             Transaction.Commit();
+            transaction = Connection.BeginTransaction();
         }
         catch (Exception)
         {
@@ -42,7 +43,11 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     }
 
     /// <inheritdoc />
-    public void Rollback() => Transaction.Rollback();
+    public void Rollback()
+    {
+        Transaction.Rollback();
+        transaction = connection?.BeginTransaction();
+    }
 
     /// <inheritdoc/>
     public void Dispose()
