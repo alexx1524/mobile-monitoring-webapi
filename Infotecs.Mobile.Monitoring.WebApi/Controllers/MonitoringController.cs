@@ -1,4 +1,5 @@
 using Infotecs.Mobile.Monitoring.Core.ClientsInforming;
+using Infotecs.Mobile.Monitoring.Core.Messages;
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
 using Infotecs.Mobile.Monitoring.Core.Services;
@@ -20,6 +21,7 @@ public class MonitoringController : Controller
     private readonly ILogger<MonitoringController> logger;
     private readonly IMonitoringService monitoringService;
     private readonly IChangeNotifier changeNotifier;
+    private readonly IMessagePublisher messagePublisher;
 
     /// <summary>
     /// Конструктор.
@@ -28,15 +30,18 @@ public class MonitoringController : Controller
     /// <param name="logger">Интерфейс логгирования.</param>
     /// <param name="monitoringService">Интерфейс сервиса мониторинговых данных.</param>
     /// <param name="changeNotifier">Интерфейс для информирования об изменении данных на сервере.</param>
+    /// <param name="messagePublisher">Интерфейс для отправкии сообщений о статусе обработки ивентов.</param>
     public MonitoringController(IUnitOfWork dbContext,
         ILogger<MonitoringController> logger,
         IMonitoringService monitoringService,
-        IChangeNotifier changeNotifier)
+        IChangeNotifier changeNotifier,
+        IMessagePublisher messagePublisher)
     {
         this.unitOfWork = dbContext;
         this.logger = logger;
         this.monitoringService = monitoringService;
         this.changeNotifier = changeNotifier;
+        this.messagePublisher = messagePublisher;
     }
 
     /// <summary>
@@ -47,13 +52,13 @@ public class MonitoringController : Controller
     [HttpPost]
     public async Task<ActionResult> AddOrUpdateAsync(AddMonitoringDataRequest request)
     {
+        var monitoringData = request.Adapt<MonitoringData>();
+
         try
         {
-            var monitoringData = request.Adapt<MonitoringData>();
-
             logger.LogInformation("Monitoring: {@Request}", request);
 
-            bool isCreated = await monitoringService.AddOrUpdateAsync(monitoringData, request.Events);
+            bool isCreated = await monitoringService.AddOrUpdateAsync(monitoringData);
 
             unitOfWork.Commit();
 
@@ -61,8 +66,6 @@ public class MonitoringController : Controller
             {
                 await changeNotifier.SendNewMonitoringDataAsync(monitoringData);
             }
-
-            return Ok();
         }
         catch (Exception e)
         {
@@ -72,6 +75,46 @@ public class MonitoringController : Controller
 
             throw;
         }
+
+        foreach (AddNodeEventRequest nodeEventRequest in request.Events)
+        {
+            try
+            {
+                logger.LogInformation("Ивент {@NodeEvent}", nodeEventRequest);
+
+                var nodeEvent = (nodeEventRequest, request.Id).Adapt<NodeEvent>(TypeAdapterConfig<(AddNodeEventRequest, string), NodeEvent>
+                    .NewConfig()
+                    .Map(dest => dest.NodeId, src => src.Item2)
+                    .Map(dest => dest.Name, src => src.Item1.Name)
+                    .Map(dest => dest.Date, src => src.Item1.Date)
+                    .Config);
+
+                nodeEvent = await monitoringService.AddEventAsync(nodeEvent);
+
+                unitOfWork.Commit();
+
+                await messagePublisher.SendProcessedNodeEventAsync(nodeEvent.Adapt<ProcessedNodeEventMessage>());
+            }
+            catch (Exception e)
+            {
+                unitOfWork.Rollback();
+
+                var message = (nodeEventRequest, request.Id, e.Message)
+                    .Adapt<UnprocessedNodeEventMessage>(TypeAdapterConfig<(AddNodeEventRequest, string, string), UnprocessedNodeEventMessage>
+                        .NewConfig()
+                        .Map(dest => dest.NodeId, src => src.Item2)
+                        .Map(dest => dest.Name, src => src.Item1.Name)
+                        .Map(dest => dest.Date, src => src.Item1.Date)
+                        .Map(dest => dest.ErrorMessage, src => src.Item3)
+                        .Config);
+
+                await messagePublisher.SendUnprocessedNodeEventAsync(message);
+
+                logger.LogError(e, "Ошибка сохранения ивента {@NodeEvent}", nodeEventRequest);
+            }
+        }
+
+        return Ok();
     }
 
     /// <summary>

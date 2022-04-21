@@ -3,6 +3,7 @@ using FluentMigrator.Runner;
 using Infotecs.Mobile.Monitoring.Core.Models;
 using Infotecs.Mobile.Monitoring.Core.Models.Sorting;
 using Infotecs.Mobile.Monitoring.Core.Repositories;
+using Infotecs.Mobile.Monitoring.Data.Migrations;
 using Infotecs.Mobile.Monitoring.Data.Models;
 using Mapster;
 using Microsoft.Extensions.Logging;
@@ -158,19 +159,20 @@ public class MonitoringDataRepository : DbRepositoryBase, IMonitoringDataReposit
     /// <summary>
     /// Добавление ивентd от ноды (устройства).
     /// </summary>
-    /// <param name="nodeId">Идентификатор ноды.</param>
     /// <param name="nodeEvent">Ивент.</param>
     /// <returns>Задача.</returns>
-    public async Task AddEventAsync(string nodeId, NodeEvent nodeEvent)
+    public async Task<NodeEvent> AddEventAsync(NodeEvent nodeEvent)
     {
         const string Query = "INSERT INTO public.node_events(name, date, nodeid) " +
-            "VALUES (@Name, @Date, @NodeId);";
+            "VALUES (@Name, @Date, @NodeId) RETURNING Id;";
 
-        await Connection.ExecuteAsync(Query, new
+        nodeEvent.EventId = (await Connection.ExecuteScalarAsync<long>(Query, new
         {
             nodeEvent.Name,
             nodeEvent.Date,
-            nodeId,
-        }, Transaction);
+            nodeEvent.NodeId,
+        }, Transaction)).ToString();
+
+        return nodeEvent;
     }
 }

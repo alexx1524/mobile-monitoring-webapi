@@ -31,6 +31,6 @@ public class AddMonitoringDataRequest
     /// <summary>
     /// Список ивентов от ноды.
     /// </summary>
-    public IEnumerable<NodeEvent> Events { get; set; } = Array.Empty<NodeEvent>();
+    public IEnumerable<AddNodeEventRequest> Events { get; set; } = Array.Empty<AddNodeEventRequest>();
 
 }
