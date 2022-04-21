@@ -6,6 +6,12 @@
 // ReSharper disable once ClassNeverInstantiated.Global
 public class NodeEventEntity
 {
+
+    /// <summary>
+    /// Идентификатор ивента.
+    /// </summary>
+    public string EventId { get; set; } = null!;
+
     /// <summary>
     /// Идентификатор ноды.
     /// </summary>
