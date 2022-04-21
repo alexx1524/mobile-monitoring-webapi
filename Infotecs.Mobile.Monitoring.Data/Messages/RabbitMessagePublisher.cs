@@ -41,11 +41,11 @@ public class RabbitMessagePublisher : IMessagePublisher
             byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message, new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy()},
-                Formatting = Formatting.Indented,
+                Formatting = Formatting.None,
             }));
 
-            IBasicProperties properties = producingService.Channel?.CreateBasicProperties() ??
-                throw new ChannelIsNullException();
+            IModel? channel = producingService.Channel;
+            IBasicProperties properties = channel?.CreateBasicProperties() ?? throw new ChannelIsNullException();
 
             properties.ContentType = "application/json";
             properties.Persistent = true;
@@ -70,11 +70,11 @@ public class RabbitMessagePublisher : IMessagePublisher
             byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message, new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy()},
-                Formatting = Formatting.Indented,
+                Formatting = Formatting.None,
             }));
 
-            IBasicProperties properties = producingService.Channel?.CreateBasicProperties() ??
-                throw new ChannelIsNullException();
+            IModel? channel = producingService.Channel;
+            IBasicProperties properties = channel?.CreateBasicProperties() ?? throw new ChannelIsNullException();
 
             properties.ContentType = "application/json";
             properties.Persistent = true;
