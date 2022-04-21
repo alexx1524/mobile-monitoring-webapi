@@ -18,7 +18,7 @@ public class UnprocessedNodeEventMessage
     /// <summary>
     /// Наименование ивента.
     /// </summary>
-    public string Name { get; set; } = null!;
+    public string? Name { get; set; }
 
     /// <summary>
     /// Сообщение об ошибке.
