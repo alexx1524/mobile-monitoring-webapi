@@ -76,37 +76,40 @@ public class MonitoringController : Controller
             throw;
         }
 
+        TypeAdapterConfig successMappingConfig = TypeAdapterConfig<(AddNodeEventRequest, string), NodeEvent>
+            .NewConfig()
+            .Map(dest => dest.NodeId, src => src.Item2)
+            .Map(dest => dest.Name, src => src.Item1.Name)
+            .Map(dest => dest.Date, src => src.Item1.Date)
+            .Config;
+
+        TypeAdapterConfig errorMappingConfig = TypeAdapterConfig<(AddNodeEventRequest, string, string), UnprocessedNodeEventMessage>
+            .NewConfig()
+            .Map(dest => dest.NodeId, src => src.Item2)
+            .Map(dest => dest.Name, src => src.Item1.Name)
+            .Map(dest => dest.Date, src => src.Item1.Date)
+            .Map(dest => dest.ErrorMessage, src => src.Item3)
+            .Config;
+
         foreach (AddNodeEventRequest nodeEventRequest in request.Events)
         {
             try
             {
                 logger.LogInformation("Ивент {@NodeEvent}", nodeEventRequest);
 
-                var nodeEvent = (nodeEventRequest, request.Id).Adapt<NodeEvent>(TypeAdapterConfig<(AddNodeEventRequest, string), NodeEvent>
-                    .NewConfig()
-                    .Map(dest => dest.NodeId, src => src.Item2)
-                    .Map(dest => dest.Name, src => src.Item1.Name)
-                    .Map(dest => dest.Date, src => src.Item1.Date)
-                    .Config);
+                var nodeEvent = (nodeEventRequest, request.Id).Adapt<NodeEvent>();
 
                 nodeEvent = await monitoringService.AddEventAsync(nodeEvent);
 
                 unitOfWork.Commit();
 
-                await messagePublisher.SendProcessedNodeEventAsync(nodeEvent.Adapt<ProcessedNodeEventMessage>());
+                await messagePublisher.SendProcessedNodeEventAsync(nodeEvent.Adapt<ProcessedNodeEventMessage>(successMappingConfig));
             }
             catch (Exception e)
             {
                 unitOfWork.Rollback();
 
-                var message = (nodeEventRequest, request.Id, e.Message)
-                    .Adapt<UnprocessedNodeEventMessage>(TypeAdapterConfig<(AddNodeEventRequest, string, string), UnprocessedNodeEventMessage>
-                        .NewConfig()
-                        .Map(dest => dest.NodeId, src => src.Item2)
-                        .Map(dest => dest.Name, src => src.Item1.Name)
-                        .Map(dest => dest.Date, src => src.Item1.Date)
-                        .Map(dest => dest.ErrorMessage, src => src.Item3)
-                        .Config);
+                var message = (nodeEventRequest, request.Id, e.Message).Adapt<UnprocessedNodeEventMessage>(errorMappingConfig);
 
                 await messagePublisher.SendUnprocessedNodeEventAsync(message);
 
