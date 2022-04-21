@@ -2,6 +2,7 @@ using System.Text;
 using Infotecs.Mobile.Monitoring.Core.Messages;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Core.DependencyInjection.Exceptions;
 using RabbitMQ.Client.Core.DependencyInjection.Services.Interfaces;
@@ -37,7 +38,11 @@ public class RabbitMessagePublisher : IMessagePublisher
     {
         try
         {
-            byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+            byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message, new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy()},
+                Formatting = Formatting.Indented,
+            }));
 
             IBasicProperties properties = producingService.Channel?.CreateBasicProperties() ??
                 throw new ChannelIsNullException();
@@ -62,7 +67,11 @@ public class RabbitMessagePublisher : IMessagePublisher
     {
         try
         {
-            byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+            byte[] body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message, new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy()},
+                Formatting = Formatting.Indented,
+            }));
 
             IBasicProperties properties = producingService.Channel?.CreateBasicProperties() ??
                 throw new ChannelIsNullException();
