@@ -1,0 +1,82 @@
+version: '3.5'
+
+services:
+  # PostgreSQL database server
+  postgresql:
+    container_name: infotecs_postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'adminpassword'
+      POSTGRES_HOST_AUTH_METHOD: 'trust'
+      PGDATA: /data/postgres
+    volumes:
+       - infotecs-postgres:/data/postgres
+    ports:
+      - "50003:5432"
+    networks:
+      - infotecs-networks
+    restart: unless-stopped
+
+  # SEQ - logging
+  seq:
+    container_name: infotecs_seq
+    image: datalust/seq:latest
+    environment:
+      ACCEPT_EULA: 'Y'
+    ports:
+      - "50002:80"
+    networks:
+      - infotecs-networks 
+    restart: unless-stopped
+
+  # RabbitMQ
+  rabbitmq:
+    container_name: infotecs_rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - infotecs-rabbitmq:/var/lib/rabbitmq/
+        - infotecs-rabbitmq:/var/log/rabbitmq
+    networks:
+        - infotecs-networks
+
+  # Infotecs.Monitoring.WebApi - backend service
+  web-api:
+    container_name: infotecs.monitoring.webapi
+    image: monitoring-webapi:latest
+    environment:
+      ConnectionStrings__SqlConnection: 'Server=postgresql;Port=5432;Database=infotecs_mobile_monitoring_db;User Id=postgres;Password=adminpassword'
+      ConnectionStrings__AdminSqlConnection: 'Server=postgresql;Port=5432;Database=postgres;User Id=postgres;Password=adminpassword'
+      Serilog__WriteTo__1__Args__serverUrl: 'http://seq:80'
+      RabbitMq__HostName: 'rabbitmq'
+    ports:
+      - "8001:80"
+    networks:
+      - infotecs-networks
+    depends_on:
+      - postgresql
+      - seq
+    restart: unless-stopped
+
+  # Infotecs.Monitoring.SPA - angular frontend
+  spa:
+    container_name: infotecs.monitoring.spa
+    image: monitoring-spa:latest
+    environment:
+      BASE_URL: 'http://localhost:8001'
+      NODE_EVENTS_FETCH_INTERVAL: 2000
+    ports:
+      - "8000:80"
+    depends_on:
+      - web-api
+
+networks:
+  infotecs-networks:
+    driver: bridge
+
+volumes:
+    infotecs-postgres:
+    infotecs-rabbitmq:
